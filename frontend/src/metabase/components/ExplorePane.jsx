@@ -35,6 +35,30 @@ type State = {
 
 const DEFAULT_VISIBLE_ITEMS = 4;
 
+const SchemaSelector = ({ schemas, selectedSchema, onChange }) =>
+  schemas &&
+  schemas.length > 1 && (
+    <div className="inline-flex align-center ml-auto bg-medium rounded p1">
+      <div className="mr1">{t`Based on the schema`}</div>
+      <Select
+        value={selectedSchema}
+        triggerElement={
+          <span className="flex align-center link">
+            <a className="text-bold">{selectedSchema}</a>
+            <Icon name="chevrondown" size={14} ml={1} />
+          </span>
+        }
+        onChange={onChange}
+      >
+        {schemas.map(schemaName => (
+          <Option key={schemaName} value={schemaName}>
+            {schemaName}
+          </Option>
+        ))}
+      </Select>
+    </div>
+  );
+
 export class ExplorePane extends React.Component {
   props: Props;
   state: State = {
@@ -63,6 +87,7 @@ export class ExplorePane extends React.Component {
     let schemaNames;
     let tables;
     let hasMore = false;
+
     if (candidates && candidates.length > 0) {
       schemaNames = candidates.map(schema => schema.schema);
       if (schemaName == null) {
@@ -89,33 +114,16 @@ export class ExplorePane extends React.Component {
             <span>{description}</span>
           </div>
         )}
-        {schemaNames &&
-          schemaNames.length > 1 && (
-            <div className="inline-flex align-center ml-auto bg-medium rounded p1">
-              <div className="mr1">{t`Based on the schema`}</div>
-              <Select
-                value={schemaName}
-                triggerElement={
-                  <span className="flex align-center link">
-                    <a className="text-bold">{schemaName}</a>
-                    <Icon name="chevrondown" size={14} ml={1} />
-                  </span>
-                }
-                onChange={e =>
-                  this.setState({
-                    schemaName: e.target.value,
-                    visibleItems: DEFAULT_VISIBLE_ITEMS,
-                  })
-                }
-              >
-                {schemaNames.map(schemaName => (
-                  <Option key={schemaName} value={schemaName}>
-                    {schemaName}
-                  </Option>
-                ))}
-              </Select>
-            </div>
-          )}
+        <SchemaSelector
+          schemas={schemaNames}
+          selectedSchema={schemaName}
+          onChange={({ target }) =>
+            this.setState({
+              schemaName: target.value,
+              visibleItems: DEFAULT_VISIBLE_ITEMS,
+            })
+          }
+        />
         {tables && (
           <ExploreList
             candidates={tables}
