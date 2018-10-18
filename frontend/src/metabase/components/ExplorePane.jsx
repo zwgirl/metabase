@@ -91,10 +91,16 @@ export class ExplorePane extends React.Component {
         )}
         {schemaNames &&
           schemaNames.length > 1 && (
-            <div className="flex align-center ml-auto">
+            <div className="inline-flex align-center ml-auto bg-medium rounded p1">
               <div className="mr1">{t`Based on the schema`}</div>
               <Select
                 value={schemaName}
+                triggerElement={
+                  <span className="flex align-center link">
+                    <a className="text-bold">{schemaName}</a>
+                    <Icon name="chevrondown" size={14} ml={1} />
+                  </span>
+                }
                 onChange={e =>
                   this.setState({
                     schemaName: e.target.value,
