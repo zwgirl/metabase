@@ -23,6 +23,8 @@ import LogoutApp from "metabase/auth/containers/LogoutApp.jsx";
 import PasswordResetApp from "metabase/auth/containers/PasswordResetApp.jsx";
 import GoogleNoAccount from "metabase/auth/components/GoogleNoAccount.jsx";
 
+import ModeContainer from "metabase/query_builder/containers/ModeContainer";
+
 /* Dashboards */
 import DashboardApp from "metabase/dashboard/containers/DashboardApp";
 import AutomaticDashboardApp from "metabase/dashboard/containers/AutomaticDashboardApp";
@@ -222,6 +224,8 @@ export const getRoutes = store => (
           <ModalRoute path="move" modal={DashboardMoveModal} />
           <ModalRoute path="copy" modal={DashboardCopyModal} />
         </Route>
+
+        <Route path="mode" component={ModeContainer} />
 
         <Route path="/question">
           <IndexRoute component={QueryBuilder} />
