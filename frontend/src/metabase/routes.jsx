@@ -225,7 +225,7 @@ export const getRoutes = store => (
           <ModalRoute path="copy" modal={DashboardCopyModal} />
         </Route>
 
-        <Route path="mode" component={ModeContainer} />
+        <Route path="mode/:q1/:q2/:q3" component={ModeContainer} />
 
         <Route path="/question">
           <IndexRoute component={QueryBuilder} />
