@@ -4,7 +4,10 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import ReactDOM from "react-dom";
 import "./TableInteractive.css";
+import { Motion, spring } from "react-motion";
+import { t } from "c-3po";
 
+import Button from "metabase/components/Button";
 import Icon from "metabase/components/Icon.jsx";
 
 import { formatValue } from "metabase/lib/formatting";
@@ -64,6 +67,7 @@ type Props = VisualizationProps & {
   onActionDismissal: () => void,
 };
 type State = {
+  customColumnDrawerOpen: boolean,
   columnWidths: number[],
   contentWidths: ?(number[]),
 
@@ -109,6 +113,7 @@ export default class TableInteractive extends Component {
     this.state = {
       columnWidths: [],
       contentWidths: null,
+      customColumnDrawerOpen: false,
     };
     this.columnHasResized = {};
     this.headerRefs = [];
@@ -649,7 +654,9 @@ export default class TableInteractive extends Component {
                 overflow: "hidden",
               }}
               className="TableInteractive-header scroll-hide-all"
-              width={width || 0}
+              width={
+                this.state.customColumnDrawerOpen ? width - 420 : width || 0
+              }
               height={HEADER_HEIGHT}
               rowCount={1}
               rowHeight={HEADER_HEIGHT}
@@ -677,7 +684,7 @@ export default class TableInteractive extends Component {
                 position: "absolute",
               }}
               className=""
-              width={width}
+              width={this.state.customColumnDrawerOpen ? width - 420 : width}
               height={height - HEADER_HEIGHT}
               columnCount={cols.length}
               columnWidth={this.getColumnWidth}
@@ -692,6 +699,62 @@ export default class TableInteractive extends Component {
               tabIndex={null}
               overscanRowCount={20}
             />
+            <div
+              className="absolute top right p2 text-brand-hover cursor-pointer"
+              onClick={() =>
+                this.setState({
+                  customColumnDrawerOpen: !this.state.customColumnDrawerOpen,
+                })
+              }
+            >
+              <Icon name="add" />
+            </div>
+            <Motion
+              defaultStyle={{ width: 0 }}
+              style={{
+                width: this.state.customColumnDrawerOpen
+                  ? spring(420)
+                  : spring(0),
+              }}
+            >
+              {({ width }) => (
+                <div
+                  className="absolute right bottom bordered full-height bg-white overflow-hidden"
+                  style={{
+                    top: -20,
+                    width,
+                    boxShadow: this.state.customColumnDrawerOpen
+                      ? "-2px 0 4px rgba(0, 0, 0, .062)"
+                      : "none",
+                  }}
+                >
+                  <div className="border-bottom p1">
+                    <input
+                      type="text"
+                      placeholder="New column name"
+                      className="input full text-medium"
+                    />
+                  </div>
+                  <div className="p1">
+                    <textarea
+                      placeholder="ColumnA + ColumnB"
+                      className="input full"
+                      ref={ref => ref && ref.focus()}
+                      resize={"vertical"}
+                    />
+                    <div className="flex align-center mt2">
+                      <a
+                        className="text-bold"
+                        onClick={() =>
+                          this.setState({ customColumnDrawerOpen: false })
+                        }
+                      >{t`Cancel`}</a>
+                      <Button primary ml="auto">{t`Save`}</Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </Motion>
           </div>
         )}
       </ScrollSync>
