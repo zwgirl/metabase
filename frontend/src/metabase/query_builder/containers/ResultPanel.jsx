@@ -78,6 +78,12 @@ const Preview = () => (
   </Box>
 );
 
+const CollapsedFields = () => (
+  <Flex align="center">
+    <Icon name="chevronright" />
+  </Flex>
+);
+
 const Data = () => (
   <Box>
     <Flex align="center" color={colors["brand"]}>
@@ -89,12 +95,15 @@ const Data = () => (
 class ResultPanel extends React.Component {
   render() {
     return (
-      <Box className="bg-white overflow-y full-height">
+      <Box className="bg-white scroll-y full-height">
         <Section>
           <Data />
         </Section>
         <Section>
           <Filters />
+          <Box my={2} color={colors["accent2"]}>
+            <CollapsedFields />
+          </Box>
         </Section>
         <Preview />
         <Flex p={3}>
