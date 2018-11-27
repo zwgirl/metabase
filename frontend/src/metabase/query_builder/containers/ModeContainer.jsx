@@ -22,69 +22,15 @@ import VisualizationPanel, {
 } from "metabase/query_builder/containers/VisualizationPanel";
 import ResultPanel from "metabase/query_builder/containers/ResultPanel";
 
-const HeaderControls = ({
-  onToggleReference,
-  onToggleVisualization,
-  onToggleFilters,
-}) => (
-  <Flex align="center">
-    <Motion
-      defaultStyle={{ scale: 0 }}
-      style={{ scale: onToggleVisualization ? spring(1) : spring(0) }}
-    >
-      {({ scale }) => (
-        <Button
-          medium
-          mx={2}
-          primary
-          onClick={() => onToggleVisualization()}
-          style={{ transform: `scale(${scale})` }}
-        >
-          Visualize
-        </Button>
-      )}
-    </Motion>
-    <IconWrapper onClick={() => onToggleFilters()}>
-      <Icon name="filter" size={22} />
-    </IconWrapper>
-    <IconWrapper onClick={() => onToggleReference()}>
-      <Icon name="reference" />
-    </IconWrapper>
-  </Flex>
-);
-
-class FilterBar extends React.Component {
-  render() {
-    const { question } = this.props;
-    window.q = question;
-    return (
-      <Flex align="center" px={3} pb={1}>
-        <Card p={1} color="white" bg={colors["accent7"]} mr={1}>
-          Filter 1
-        </Card>
-        <Card p={1} color="white" bg={colors["accent7"]}>
-          Filter 2
-        </Card>
-      </Flex>
-    );
-  }
-}
-
 @fitViewport
 class ModeContainer extends React.Component {
   state = {
     vizPanelOpen: false,
     referencePanelOpen: false,
-    showResultPane: false,
-    showFilterBar: false,
+    showResultPane: true,
   };
   render() {
-    const {
-      referencePanelOpen,
-      vizPanelOpen,
-      showResultPane,
-      showFilterBar,
-    } = this.state;
+    const { referencePanelOpen, vizPanelOpen, showResultPane } = this.state;
     const wrapperHeight =
       findDOMNode(this.container) && findDOMNode(this.container).offsetHeight;
     return (
@@ -100,42 +46,45 @@ class ModeContainer extends React.Component {
             }
             return (
               <Box className="flex flex-column flex-full">
-                <Flex align="center" p={2} px={3}>
-                  <h2>{question.displayName()}</h2>
-                  <Box ml="auto">
-                    <HeaderControls
-                      onToggleReference={() =>
-                        this.setState({
-                          referencePanelOpen: !this.state.referencePanelOpen,
-                        })
-                      }
-                      onToggleVisualization={
-                        this.state.showResultPane
-                          ? () => this.setState({ showResultPane: false })
-                          : null
-                      }
-                      onToggleFilters={() =>
-                        this.setState({
-                          showFilterBar: !this.state.showFilterBar,
-                        })
-                      }
-                    />
-                  </Box>
-                </Flex>
-                <Motion
-                  defaultStyle={{
-                    height: 0,
-                  }}
-                  style={{
-                    height: showFilterBar ? spring(60) : spring(0),
-                  }}
+                <Flex
+                  align="center"
+                  p={[2, 3]}
+                  px={3}
+                  className="border-bottom bg-white relative"
                 >
-                  {({ height }) => (
-                    <Box style={{ height, overflow: "hidden" }} w={"100%"}>
-                      <FilterBar question={question} />
+                  <h2>{question.displayName()}</h2>
+                  <Absolute bottom={0} left={0} right={0} className="flex">
+                    <Box
+                      ml="auto"
+                      mr="auto"
+                      className="bordered shadowed cursor-pointer z6 relative bg-white"
+                      style={{ bottom: -16, borderRadius: 99 }}
+                      px={2}
+                      py={1}
+                      onClick={() =>
+                        this.setState({
+                          showResultPane: !this.state.showResultPane,
+                        })
+                      }
+                    >
+                      {this.state.showResultPane ? (
+                        <Icon name="chevrondown" />
+                      ) : (
+                        <Flex align="center">
+                          <Box mx={1} color={colors["brand"]}>
+                            Table
+                          </Box>
+                          <Box mx={1} color={colors["accent1"]}>
+                            Agg
+                          </Box>
+                          <Box mx={1} color={colors["accent2"]}>
+                            <Icon name="filter" size={20} />
+                          </Box>
+                        </Flex>
+                      )}
                     </Box>
-                  )}
-                </Motion>
+                  </Absolute>
+                </Flex>
                 <Box
                   className="flex-full relative"
                   ref={node => (this.container = node)}
@@ -240,11 +189,6 @@ class ModeContainer extends React.Component {
                         left={0}
                         right={0}
                         top={0}
-                        onClick={() =>
-                          this.setState({
-                            showResultPane: !this.state.showResultPane,
-                          })
-                        }
                         style={{
                           zIndex: 3,
                           backgroundColor: "white",
@@ -252,6 +196,9 @@ class ModeContainer extends React.Component {
                         }}
                       >
                         <ResultPanel
+                          onView={() =>
+                            this.setState({ showResultPane: false })
+                          }
                           dataId={this.props.params.q2}
                           aggregationId={this.props.params.q3}
                         />
