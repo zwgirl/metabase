@@ -238,6 +238,7 @@ export default class QueryBuilder extends Component {
             setMode={this.props.setMode}
             mode={uiControls.mode}
           />
+          <ModeTabs setMode={this.props.setMode} mode={uiControls.mode} />
           {query instanceof StructuredQuery ? (
             <QuestionDataWorksheet {...this.props} />
           ) : (
@@ -269,6 +270,7 @@ export default class QueryBuilder extends Component {
             setMode={this.props.setMode}
             mode={uiControls.mode}
           />
+          <ModeTabs setMode={this.props.setMode} mode={uiControls.mode} />
           <QuestionVisualize {...this.props} />
         </div>
       );
@@ -387,3 +389,19 @@ class LegacyQueryBuilder extends Component {
     );
   }
 }
+
+import Radio from "metabase/components/Radio";
+const TABS: TabOption[] = [
+  { name: t`Data`, value: "worksheet" },
+  { name: t`Visualize`, value: "visualize" },
+];
+const ModeTabs = ({ setMode, mode }) => (
+  <div className="bg-white full px3 border-bottom">
+    <Radio
+      value={mode}
+      options={TABS}
+      onChange={value => setMode(value)}
+      underlined
+    />
+  </div>
+);

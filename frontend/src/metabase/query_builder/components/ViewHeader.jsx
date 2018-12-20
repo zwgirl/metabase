@@ -107,35 +107,14 @@ const ViewHeader = ({ question, setMode, mode, setModal }) => (
         </PopoverWithTrigger>
       </Flex>
     </Flex>
-    <div className="absolute bottom left right flex z2" style={{ bottom: -18 }}>
-      <div
-        className="bordered rounded px2 shadowed flex align-center ml-auto mr-auto bg-white p1 cursor-pointer text-light text-bold"
-        style={{ borderRadius: 99 }}
+    <Box ml="auto">
+      <Button
+        primary={mode !== "present"}
+        onClick={() => setMode(mode === "present" ? "visualize" : "present")}
       >
-        <QueryDefinition question={question} />
-        <RoundButton
-          iconColor={
-            mode === "worksheet" ? colors["brand"] : colors["text-medium"]
-          }
-          icon="pencil"
-          onClick={() => setMode("worksheet")}
-        />
-        <RoundButton
-          iconColor={
-            mode === "visualize" ? colors["brand"] : colors["text-medium"]
-          }
-          icon="area"
-          onClick={() => setMode("visualize")}
-        />
-        <RoundButton
-          iconColor={
-            mode === "present" ? colors["brand"] : colors["text-medium"]
-          }
-          icon="star"
-          onClick={() => setMode("present")}
-        />
-      </div>
-    </div>
+        {mode === "present" ? "Edit" : "Present"}
+      </Button>
+    </Box>
   </Flex>
 );
 
