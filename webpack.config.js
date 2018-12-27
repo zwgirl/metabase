@@ -1,8 +1,8 @@
 /* eslint-env node */
 /* eslint-disable import/no-commonjs */
 
-require("babel-register");
-require("babel-polyfill");
+require("@babel/register");
+require("@babel/polyfill");
 
 var webpack = require("webpack");
 
@@ -30,6 +30,7 @@ var NODE_ENV = process.env["NODE_ENV"] || "development";
 // Babel:
 var BABEL_CONFIG = {
   cacheDirectory: process.env.BABEL_DISABLE_CACHE ? null : ".babel_cache",
+  presets: ["@babel/env"],
 };
 
 var CSS_CONFIG = {
@@ -107,17 +108,11 @@ var config = (module.exports = {
       // NOTE @kdoh - 7/24/18
       // icepick 2.x is es6 by defalt, to maintain backwards compatability
       // with ie11 point to the minified version
-      icepick: __dirname + "/node_modules/icepick/icepick.min"
+      icepick: __dirname + "/node_modules/icepick/icepick.min",
     },
   },
 
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin({
-      name: "vendor",
-      minChunks(module) {
-        return module.context && module.context.indexOf("node_modules") >= 0;
-      },
-    }),
     new UnusedFilesWebpackPlugin({
       globOptions: {
         ignore: [
@@ -233,7 +228,7 @@ if (NODE_ENV === "hot") {
   config.plugins.unshift(
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.NamedModulesPlugin(),
-    new webpack.HotModuleReplacementPlugin()
+    new webpack.HotModuleReplacementPlugin(),
   );
 }
 
@@ -268,7 +263,7 @@ if (NODE_ENV !== "production") {
           reserved: tokens,
         },
       },
-    })
+    }),
   );
 
   config.devtool = "source-map";

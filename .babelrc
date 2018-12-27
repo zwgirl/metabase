@@ -1,29 +1,12 @@
 {
-  "plugins": [
-    "babel-plugin-styled-components",
-    "transform-flow-strip-types",
-    "add-react-displayname",
-    "transform-decorators-legacy",
-    ["transform-builtin-extend", {
-        "globals": ["Error", "Array"]
-    }],
-    "syntax-trailing-function-commas"
-  ],
-  "presets": ["es2015", "stage-0", "react"],
-  "env": {
-    "development": {
-      "presets": []
-    },
-    "extract": {
-      "plugins": [
-        ["c-3po", {
-          "extract": {
-            "output": "locales/metabase-frontend.pot"
-          },
-          "discover": ["t", "jt"],
-          "numberedExpressions": true
-        }]
-      ]
-    }
-  }
+    "presets": ["@babel/env", "@babel/react"],
+    "plugins": [
+        "syntax-dynamic-import",
+        "syntax-trailing-function-commas",
+        ["transform-builtin-extend", {
+            "globals": ["Error", "Array"]
+        }],
+        "transform-decorators-legacy",
+        "transform-flow-strip-types"
+    ]
 }
