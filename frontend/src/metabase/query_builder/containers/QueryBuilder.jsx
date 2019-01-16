@@ -251,22 +251,24 @@ class LegacyQueryBuilder extends Component {
             <QueryHeader {...this.props} />
           </div>
 
-          <div id="react_qb_editor" className="z2 hide sm-show">
-            {query instanceof NativeQuery ? (
-              <NativeQueryEditor
-                {...this.props}
-                isOpen={!card.dataset_query.native.query || isDirty}
-                datasetQuery={card && card.dataset_query}
-              />
-            ) : query instanceof StructuredQuery ? (
-              <div className="wrapper">
-                <GuiQueryEditor
+          {uiControls.mode === "editing" && (
+            <div id="react_qb_editor" className="z2 hide sm-show">
+              {query instanceof NativeQuery ? (
+                <NativeQueryEditor
                   {...this.props}
+                  isOpen={!card.dataset_query.native.query || isDirty}
                   datasetQuery={card && card.dataset_query}
                 />
-              </div>
-            ) : null}
-          </div>
+              ) : query instanceof StructuredQuery ? (
+                <div className="wrapper">
+                  <GuiQueryEditor
+                    {...this.props}
+                    datasetQuery={card && card.dataset_query}
+                  />
+                </div>
+              ) : null}
+            </div>
+          )}
 
           <div
             ref="viz"

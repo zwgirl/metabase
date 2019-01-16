@@ -80,6 +80,9 @@ const getTemplateTagCount = (question: Question) => {
   return query instanceof NativeQuery ? query.templateTags().length : 0;
 };
 
+export const SET_MODE = "metabase/qb/SET_MODE";
+export const setMode = createAction(SET_MODE);
+
 export const SET_CURRENT_STATE = "metabase/qb/SET_CURRENT_STATE";
 const setCurrentState = createAction(SET_CURRENT_STATE);
 
@@ -198,6 +201,7 @@ export const initializeQB = (location, params) => {
 
     let card, databasesList, originalCard;
     let uiControls: UiControls = {
+      mode: "present",
       isEditing: false,
       isShowingTemplateTagsEditor: false,
     };

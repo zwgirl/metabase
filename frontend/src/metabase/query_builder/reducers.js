@@ -41,6 +41,7 @@ import {
   UPDATE_ENABLE_EMBEDDING,
   UPDATE_EMBEDDING_PARAMS,
   SHOW_CHART_SETTINGS,
+  SET_MODE,
 } from "./actions";
 
 // various ui state options
@@ -70,6 +71,9 @@ export const uiControls = handleActions(
         isShowingTemplateTagsEditor,
         isShowingDataReference: false,
       }),
+    },
+    [SET_MODE]: {
+      next: (state, { payload }) => ({ ...state, mode: payload }),
     },
     [SET_DATASET_QUERY]: {
       next: (state, { payload }) => ({
@@ -120,6 +124,8 @@ export const uiControls = handleActions(
     isEditing: false,
     isRunning: false,
     chartSettings: null,
+    mode: "present",
+    isShowingFilterPanel: false,
   },
 );
 
