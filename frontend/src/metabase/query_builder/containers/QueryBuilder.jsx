@@ -22,6 +22,11 @@ import TagEditorSidebar from "../components/template_tags/TagEditorSidebar.jsx";
 import SavedQuestionIntroModal from "../components/SavedQuestionIntroModal.jsx";
 import ActionsWidget from "../components/ActionsWidget.jsx";
 
+import Icon from "metabase/components/Icon";
+import FilterWidgetList from "../components/filters/FilterWidgetList";
+import PopoverWithTrigger from "metabase/components/PopoverWithTrigger";
+import FilterPopover from "../components/filters/FilterPopover";
+
 import title from "metabase/hoc/Title";
 
 import {
@@ -228,7 +233,15 @@ export default class QueryBuilder extends Component {
 
 class LegacyQueryBuilder extends Component {
   render() {
-    const { query, card, isDirty, databases, uiControls, mode } = this.props;
+    const {
+      query,
+      card,
+      isDirty,
+      databases,
+      uiControls,
+      mode,
+      setDatasetQuery,
+    } = this.props;
 
     // if we don't have a card at all or no databases then we are initializing, so keep it simple
     if (!card || !databases) {
@@ -249,6 +262,42 @@ class LegacyQueryBuilder extends Component {
         >
           <div id="react_qb_header">
             <QueryHeader {...this.props} />
+            {uiControls.mode === "present" && (
+              <div className="flex align-center">
+                <FilterWidgetList
+                  query={query}
+                  filters={query.filters()}
+                  removeFilter={index =>
+                    query.removeFilter(index).update(setDatasetQuery)
+                  }
+                  updateFilter={(index, filter) =>
+                    query.updateFilter(index, filter).update(setDatasetQuery)
+                  }
+                />
+                <PopoverWithTrigger
+                  id="FilterPopover"
+                  ref="filterPopover"
+                  triggerElement={<Icon name="add" />}
+                  triggerClasses="flex align-center"
+                  getTarget={() => this.refs.addFilterTarget}
+                  horizontalAttachments={["left", "center"]}
+                  autoWidth
+                >
+                  <FilterPopover
+                    isNew
+                    query={query}
+                    onCommitFilter={filter =>
+                      query.addFilter(filter).update(setDatasetQuery)
+                    }
+                    onClose={() => this.refs.filterPopover.close()}
+                  />
+                </PopoverWithTrigger>
+
+                <span>
+                  <Icon name="more" />
+                </span>
+              </div>
+            )}
           </div>
 
           {uiControls.mode === "editing" && (
