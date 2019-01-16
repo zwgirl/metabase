@@ -36,52 +36,7 @@ export default class VisualizationSettings extends React.Component {
       { card: question.card(), data: result.data },
     ]);
 
-    let triggerElement = (
-      <div className="p1 text-bold cursor-pointer text-default flex align-center">
-        <Icon className="mr1" name={CardVisualization.iconName} size={12} />
-        {CardVisualization.uiName}
-        <Icon className="ml1" name="chevrondown" size={8} />
-      </div>
-    );
-
-    return (
-      <div className="relative">
-        <PopoverWithTrigger
-          id="VisualizationPopover"
-          ref="displayPopover"
-          className="ChartType-popover"
-          triggerId="VisualizationTrigger"
-          triggerElement={triggerElement}
-          triggerClasses="flex align-center"
-          sizeToFit
-        >
-          <ul className="pt1 pb1 scroll-y">
-            {Array.from(visualizations).map(([vizType, viz], index) => (
-              <li
-                key={index}
-                className={cx(
-                  "p2 flex align-center cursor-pointer bg-brand-hover text-white-hover",
-                  {
-                    "ChartType--selected": vizType === question.display(),
-                    "ChartType--notSensible": !(
-                      result &&
-                      result.data &&
-                      viz.isSensible &&
-                      viz.isSensible(result.data)
-                    ),
-                    hide: viz.hidden,
-                  },
-                )}
-                onClick={this.setDisplay.bind(null, vizType)}
-              >
-                <Icon name={viz.iconName} size={12} />
-                <span className="ml1">{viz.uiName}</span>
-              </li>
-            ))}
-          </ul>
-        </PopoverWithTrigger>
-      </div>
-    );
+    return <div className="relative" />;
   }
 
   open = initial => {
@@ -97,17 +52,6 @@ export default class VisualizationSettings extends React.Component {
       const { chartSettings } = this.props.uiControls;
       return (
         <div className="VisualizationSettings">
-          <div className="pl0 Query-label">{t`Visualization`}</div>
-          <div className="flex align-center">
-            {this.renderChartTypePicker()}
-            <span
-              className="text-brand-hover cursor-pointer"
-              data-metabase-event="Query Builder;Chart Settings"
-              onClick={this.open}
-            >
-              <Icon name="gear" />
-            </span>
-          </div>
           <Modal wide tall isOpen={chartSettings} onClose={this.close}>
             <ChartSettings
               question={this.props.question}
