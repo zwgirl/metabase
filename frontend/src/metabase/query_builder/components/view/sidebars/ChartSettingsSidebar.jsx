@@ -20,29 +20,6 @@ const ChartSettingsSidebar = ({
 }) =>
   result && (
     <div className="full-height">
-      <div className="flex align-center px4 py2 mb1 bg-brand text-white">
-        <div
-          className="flex align-center cursor-pointer"
-          onClick={() =>
-            setUIControls({
-              isShowingChartSettingsSidebar: false,
-              isShowingChartTypeSidebar: true,
-            })
-          }
-        >
-          <Icon name="chevronleft" />
-          <h3 className="text-heavy ml1">
-            {visualizations.get(question.display()).uiName} {t`options`}
-          </h3>
-        </div>
-        <Button
-          white
-          className="flex-align-right"
-          onClick={onClose}
-        >
-          {t`Done`}
-        </Button>
-      </div>
       <ChartSettings
         question={question}
         addField={addField}
@@ -57,6 +34,32 @@ const ChartSettingsSidebar = ({
         noPreview
         initial={initialChartSetting}
       />
+
+    <div className="absolute bottom scroll-y bg-medium" style={{width: 420}}>
+        <div className="flex align-center px4 py2 mb1 text-brand">
+          <div
+            className="flex align-center cursor-pointer"
+            onClick={() =>
+              setUIControls({
+                isShowingChartSettingsSidebar: false,
+                isShowingChartTypeSidebar: true,
+              })
+            }
+          >
+            <Icon name="chevronleft" />
+            <h3 className="text-heavy ml1">
+              {visualizations.get(question.display()).uiName} {t`options`}
+            </h3>
+          </div>
+          <Button
+            primary
+            className="flex-align-right"
+            onClick={onClose}
+          >
+            {t`Done`}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 
