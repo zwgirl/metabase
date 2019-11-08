@@ -187,6 +187,7 @@ export const getRoutes = store => (
       {/* MAIN */}
       <Route component={IsAuthenticated}>
         {/* The global all hands rotues, things in here are for all the folks */}
+        {/*
         <Route
           path="/"
           component={Overworld}
@@ -197,6 +198,8 @@ export const getRoutes = store => (
             }
           }}
         />
+        */}
+        <Redirect from="/" to="/collection/root" />
 
         <Route path="/explore" component={PostSetupApp} />
         <Route path="/explore/:databaseId" component={PostSetupApp} />

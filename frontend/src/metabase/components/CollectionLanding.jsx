@@ -175,7 +175,7 @@ class DefaultLanding extends React.Component {
       collection,
       collectionId,
 
-      collections,
+      collections: subCollections,
       pinned,
       unpinned,
 
@@ -185,12 +185,16 @@ class DefaultLanding extends React.Component {
       selection,
       onToggleSelected,
       location,
+      collectionAncestorTiers,
     } = this.props;
     const { selectedItems, selectedAction } = this.state;
 
-    const collectionWidth = unpinned.length > 0 ? [1, 1 / 3] : 1;
-    const itemWidth = unpinned.length > 0 ? [1, 2 / 3] : 0;
-    const collectionGridSize = unpinned.length > 0 ? 1 : [1, 1 / 4];
+    // const collectionWidth = unpinned.length > 0 ? [1, 1 / 3] : 1;
+    // const itemWidth = unpinned.length > 0 ? [1, 2 / 3] : 0;
+    // const collectionGridSize = unpinned.length > 0 ? 1 : [1, 1 / 4];
+    const collectionWidth = [1, 1 / 3];
+    const itemWidth = [1, 2 / 3];
+    const collectionGridSize = 1;
 
     let unpinnedItems = unpinned;
 
@@ -199,16 +203,43 @@ class DefaultLanding extends React.Component {
     }
 
     const collectionIsEmpty =
-      !unpinned.length > 0 && !collections.length > 0 && !pinned.length > 0;
+      !unpinned.length > 0 && !subCollections.length > 0 && !pinned.length > 0;
     const collectionHasPins = pinned.length > 0;
     const collectionHasItems = unpinned.length > 0;
 
+    console.log(
+      "CollectionList render",
+      collectionAncestorTiers,
+      subCollections,
+    );
+
+    let collections = subCollections;
+    for (const tier of collectionAncestorTiers.reverse()) {
+      if (collections.length === 0) {
+        collections = tier;
+        continue;
+      }
+      const index = tier.findIndex(t => t.id === collections[0].collection_id);
+      collections = [
+        ...tier.slice(0, index),
+        { ...tier[index], children: collections },
+        ...tier.slice(index + 1),
+      ];
+    }
+    collections = [
+      { ...ancestors[0], model: "collection", name: "Home", id: "root" },
+      ...collections,
+    ];
+
+    console.log("collections", collections);
+
     const showSidebar =
       // if the user has write permissions or if there are collections then show the sidebar
-      (collection.can_write || collections.length > 0) &&
-      // there should also be at least one item, otherwise we have a different
-      // new collection CTA
-      !collectionIsEmpty;
+      collection.can_write || collections.length > 0;
+    // &&
+    // there should also be at least one item, otherwise we have a different
+    // new collection CTA
+    // !collectionIsEmpty;
     return (
       <Box>
         <Box>
@@ -220,7 +251,7 @@ class DefaultLanding extends React.Component {
             bg={pinned.length ? color("bg-medium") : null}
           >
             <Box>
-              <Box mb={1}>
+              {/* <Box mb={1}>
                 <BrowserCrumbs
                   analyticsContext={ANALYTICS_CONTEXT}
                   crumbs={[
@@ -234,11 +265,8 @@ class DefaultLanding extends React.Component {
                     })),
                   ]}
                 />
-              </Box>
+              </Box> */}
               <Flex align="center">
-                <PageHeading className="text-wrap">
-                  {collection.name}
-                </PageHeading>
                 {collection.description && (
                   <Tooltip tooltip={collection.description}>
                     <Icon
@@ -281,93 +309,108 @@ class DefaultLanding extends React.Component {
           </Flex>
           <Box>
             <Box>
-              {collectionHasPins ? (
-                <Box px={PAGE_PADDING} pt={2} pb={3} bg={color("bg-medium")}>
-                  <CollectionSectionHeading>{t`Pins`}</CollectionSectionHeading>
-                  <PinDropTarget
-                    pinIndex={pinned[pinned.length - 1].collection_position + 1}
-                    noDrop
-                    marginLeft={8}
-                    marginRight={8}
-                  >
-                    <Grid>
-                      {pinned.map((item, index) => (
-                        <GridItem
-                          w={[1, 1 / 3]}
-                          className="relative"
-                          key={index}
-                        >
-                          <ItemDragSource item={item} collection={collection}>
-                            <PinnedItem
-                              key={`${item.model}:${item.id}`}
-                              index={index}
-                              item={item}
-                              collection={collection}
-                            />
-                            <PinPositionDropTarget
-                              pinIndex={item.collection_position}
-                              left
-                            />
-                            <PinPositionDropTarget
-                              pinIndex={item.collection_position + 1}
-                              right
-                            />
-                          </ItemDragSource>
-                        </GridItem>
-                      ))}
-                      {pinned.length % 2 === 1 ? (
-                        <GridItem w={1 / 4} className="relative">
-                          <PinPositionDropTarget
-                            pinIndex={
-                              pinned[pinned.length - 1].collection_position + 1
-                            }
-                          />
-                        </GridItem>
-                      ) : null}
-                    </Grid>
-                  </PinDropTarget>
-                </Box>
-              ) : (
-                <PinDropTarget pinIndex={1} hideUntilDrag>
-                  {({ hovered }) => (
-                    <div
-                      className={cx(
-                        "p2 flex layout-centered",
-                        hovered ? "text-brand" : "text-light",
-                      )}
-                    >
-                      <Icon name="pin" mr={1} />
-                      {t`Drag something here to pin it to the top`}
-                    </div>
-                  )}
-                </PinDropTarget>
-              )}
               <Box pt={[1, 2]} px={[2, 4]}>
                 <Grid>
                   {showSidebar && (
                     <GridItem w={collectionWidth}>
                       <Box pr={2} className="relative">
-                        <Box py={2}>
+                        {/* <Box py={2}>
                           <CollectionSectionHeading>
                             {t`Collections`}
                           </CollectionSectionHeading>
-                        </Box>
+                        </Box> */}
                         <CollectionList
                           analyticsContext={ANALYTICS_CONTEXT}
                           currentCollection={collection}
                           collections={collections}
                           isRoot={collectionId === "root"}
                           w={collectionGridSize}
+                          collectionAncestorTiers={collectionAncestorTiers}
                         />
                       </Box>
                     </GridItem>
                   )}
-                  {collectionHasItems && (
-                    <GridItem w={itemWidth}>
+                  <GridItem w={itemWidth}>
+                    <PageHeading className="text-wrap">
+                      {collection.name}
+                    </PageHeading>
+                    {collectionHasPins ? (
+                      <Box
+                        px={PAGE_PADDING}
+                        pt={2}
+                        pb={3}
+                        bg={color("bg-medium")}
+                      >
+                        <CollectionSectionHeading>{t`Pins`}</CollectionSectionHeading>
+                        <PinDropTarget
+                          pinIndex={
+                            pinned[pinned.length - 1].collection_position + 1
+                          }
+                          noDrop
+                          marginLeft={8}
+                          marginRight={8}
+                        >
+                          <Grid>
+                            {pinned.map((item, index) => (
+                              <GridItem
+                                w={[1, 1 / 3]}
+                                className="relative"
+                                key={index}
+                              >
+                                <ItemDragSource
+                                  item={item}
+                                  collection={collection}
+                                >
+                                  <PinnedItem
+                                    key={`${item.model}:${item.id}`}
+                                    index={index}
+                                    item={item}
+                                    collection={collection}
+                                  />
+                                  <PinPositionDropTarget
+                                    pinIndex={item.collection_position}
+                                    left
+                                  />
+                                  <PinPositionDropTarget
+                                    pinIndex={item.collection_position + 1}
+                                    right
+                                  />
+                                </ItemDragSource>
+                              </GridItem>
+                            ))}
+                            {pinned.length % 2 === 1 ? (
+                              <GridItem w={1 / 4} className="relative">
+                                <PinPositionDropTarget
+                                  pinIndex={
+                                    pinned[pinned.length - 1]
+                                      .collection_position + 1
+                                  }
+                                />
+                              </GridItem>
+                            ) : null}
+                          </Grid>
+                        </PinDropTarget>
+                      </Box>
+                    ) : (
+                      <PinDropTarget pinIndex={1} hideUntilDrag>
+                        {({ hovered }) => (
+                          <div
+                            className={cx(
+                              "p2 flex layout-centered",
+                              hovered ? "text-brand" : "text-light",
+                            )}
+                          >
+                            <Icon name="pin" mr={1} />
+                            {t`Drag something here to pin it to the top`}
+                          </div>
+                        )}
+                      </PinDropTarget>
+                    )}
+                    {collectionHasItems ? (
                       <Box>
-                        <ItemTypeFilterBar
+                        {/* <ItemTypeFilterBar
                           analyticsContext={ANALYTICS_CONTEXT}
-                        />
+                        /> */}
                         <Card mt={1} className="relative">
                           {unpinnedItems.length > 0 ? (
                             <PinDropTarget pinIndex={null} margin={8}>
@@ -436,8 +479,12 @@ class DefaultLanding extends React.Component {
                           )}
                         </Card>
                       </Box>
-                    </GridItem>
-                  )}
+                    ) : (
+                      <Box>
+                        <CollectionEmptyState />
+                      </Box>
+                    )}
+                  </GridItem>
                 </Grid>
                 {unpinned.length === 0 && (
                   <PinDropTarget pinIndex={null} hideUntilDrag margin={10}>
@@ -454,12 +501,12 @@ class DefaultLanding extends React.Component {
                     )}
                   </PinDropTarget>
                 )}
-
+                {/*
                 {collectionIsEmpty && (
                   <Flex align="center" justify="center" w={1}>
                     <CollectionEmptyState />
                   </Flex>
-                )}
+                )} */}
               </Box>
             </Box>
             <BulkActionBar showing={selected.length > 0}>
@@ -643,16 +690,55 @@ const SelectionControls = ({
   id: (state, props) => props.params.collectionId,
   reload: true,
 })
+@connect(
+  (state, props) => ({
+    collectionAncestorTiers: props.collection.effective_ancestors.map(
+      ({ id }) =>
+        Search.selectors.getList(state, {
+          entityQuery: { model: "collection", collection: id },
+        }),
+    ),
+  }),
+  dispatch => ({
+    fetchAncestors: collections =>
+      Promise.all(
+        collections.map(({ id }) =>
+          dispatch(
+            Search.actions.fetchList({ model: "collection", collection: id }),
+          ),
+        ),
+      ),
+  }),
+)
 class CollectionLanding extends React.Component {
+  componentDidUpdate() {
+    this.fetchAncestorTiers();
+  }
+  componentDidMount() {
+    this.fetchAncestorTiers();
+  }
+
+  fetchAncestorTiers() {
+    const { fetchAncestors, collection, collectionAncestorTiers } = this.props;
+    if (collection && collectionAncestorTiers.some(x => x == null)) {
+      fetchAncestors(collection.effective_ancestors);
+    }
+  }
+
   render() {
     const {
       object: currentCollection,
       params: { collectionId },
+      collectionAncestorTiers,
     } = this.props;
     const isRoot = collectionId === "root";
 
     const ancestors =
       (currentCollection && currentCollection.effective_ancestors) || [];
+
+    if (collectionAncestorTiers.some(x => x == null)) {
+      return null;
+    }
 
     return (
       <Box>
@@ -661,6 +747,7 @@ class CollectionLanding extends React.Component {
           ancestors={ancestors}
           collection={currentCollection}
           collectionId={collectionId}
+          collectionAncestorTiers={collectionAncestorTiers}
         />
         {
           // Need to have this here so the child modals will show up

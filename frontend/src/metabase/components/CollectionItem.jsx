@@ -12,14 +12,14 @@ const ItemLink = props => (
   <Link
     to={`collection/${props.collection.id}`}
     bg={
-      props.hovered
+      props.hovered || props.active
         ? color("brand")
         : props.highlighted
         ? color("bg-light")
         : color("bg-medium")
     }
-    color={props.hovered ? "white" : color("text-medium")}
-    className="block rounded relative text-brand-hover"
+    color={props.hovered || props.active ? "white" : color("text-medium")}
+    className="block rounded relative"
     data-metabase-event={props.event}
     style={{
       borderSize: 1,
@@ -34,7 +34,7 @@ const ItemLink = props => (
         ? "dotted"
         : "solid",
     }}
-    hover={{ color: color("brand") }}
+    // hover={{ color: color("brand") }}
   >
     {props.children}
   </Link>
@@ -47,22 +47,24 @@ const ItemInfo = props => (
 );
 
 const CollectionItem = props => {
-  const icon = (
-    <Icon
-      name={props.iconName}
-      mx={props.asCard ? 0 : 1}
-      color={props.asCard ? "white" : color("bg-dark")}
-    />
-  );
+  // const icon = (
+  //   <Icon
+  //     name={props.iconName}
+  //     mx={props.asCard ? 0 : 1}
+  //     color={props.asCard ? "white" : color("bg-dark")}
+  //   />
+  // );
 
   const content = (
     <Flex
       align="center"
-      py={props.asCard ? 1 : 2}
-      px={props.asCard ? 1 : 0}
+      // py={props.asCard ? 1 : 2}
+      // px={props.asCard ? 1 : 0}
+      py={0}
+      px={0}
       key={`collection-${props.collection.id}`}
     >
-      {props.asCard ? (
+      {/* {props.asCard ? (
         <Flex
           align="center"
           justify="center"
@@ -75,13 +77,14 @@ const CollectionItem = props => {
         </Flex>
       ) : (
         icon
-      )}
+      )} */}
       <ItemInfo {...props} />
     </Flex>
   );
   return (
     <ItemLink {...props}>
-      {props.asCard ? <Card hoverable>{content}</Card> : content}
+      {content}
+      {/* {props.asCard ? <Card hoverable>{content}</Card> : content} */}
     </ItemLink>
   );
 };

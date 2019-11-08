@@ -31,13 +31,15 @@ class CollectionList extends React.Component {
       w,
       asCards,
     } = this.props;
+    console.log("currentCollection", currentCollection);
+    console.log("collections[0]", collections[0]);
     return (
       <Box className="relative">
         <Grid>
           {collections
             .filter(c => c.id !== currentUser.personal_collection_id)
             .map(collection => (
-              <GridItem w={w} key={collection.id}>
+              <GridItem w={w} key={collection.id} py={0}>
                 <CollectionDropTarget collection={collection}>
                   {({ highlighted, hovered }) => (
                     <ItemDragSource
@@ -50,10 +52,19 @@ class CollectionList extends React.Component {
                         hovered={hovered}
                         event={`${analyticsContext};Collection List;Collection click`}
                         asCard={asCards}
+                        active={collection.id === currentCollection.id}
                       />
                     </ItemDragSource>
                   )}
                 </CollectionDropTarget>
+                {collection.children && (
+                  <div className="pl2">
+                    <CollectionList
+                      {...this.props}
+                      collections={collection.children}
+                    />
+                  </div>
+                )}
               </GridItem>
             ))}
           {isRoot && (
@@ -93,7 +104,7 @@ class CollectionList extends React.Component {
               />
             </GridItem>
           )}
-          {currentCollection && currentCollection.can_write && (
+          {/* {currentCollection && currentCollection.can_write && (
             <GridItem w={w}>
               <Link
                 to={Urls.newCollection(currentCollection.id)}
@@ -108,7 +119,7 @@ class CollectionList extends React.Component {
                 </Flex>
               </Link>
             </GridItem>
-          )}
+          )} */}
         </Grid>
       </Box>
     );
