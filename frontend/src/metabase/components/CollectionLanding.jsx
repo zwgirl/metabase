@@ -341,7 +341,6 @@ class DefaultLanding extends React.Component {
                         pb={3}
                         bg={color("bg-medium")}
                       >
-                        <CollectionSectionHeading>{t`Pins`}</CollectionSectionHeading>
                         <PinDropTarget
                           pinIndex={
                             pinned[pinned.length - 1].collection_position + 1
@@ -353,7 +352,7 @@ class DefaultLanding extends React.Component {
                           <Grid>
                             {pinned.map((item, index) => (
                               <GridItem
-                                w={[1, 1 / 3]}
+                                w={[1, 1 / 2]}
                                 className="relative"
                                 key={index}
                               >
@@ -406,7 +405,7 @@ class DefaultLanding extends React.Component {
                         )}
                       </PinDropTarget>
                     )}
-                    {collectionHasItems ? (
+                    {collectionHasItems && (
                       <Box>
                         {/* <ItemTypeFilterBar
                           analyticsContext={ANALYTICS_CONTEXT}
@@ -479,7 +478,8 @@ class DefaultLanding extends React.Component {
                           )}
                         </Card>
                       </Box>
-                    ) : (
+                    )}
+                    {!collectionHasItems && !collectionHasPins && (
                       <Box>
                         <CollectionEmptyState />
                       </Box>
