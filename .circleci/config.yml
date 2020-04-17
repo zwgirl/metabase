@@ -899,13 +899,13 @@ workflows:
           test-files-location: frontend/test/metabase-db/mongo
 
       - fe-tests-cypress:
-        name: fe-tests-cypress-postgres
-        requires:
-          - build-uberjar
-          - fe-deps
-        e: fe-postgres-9-6
-        only-single-database: true
-        test-files-location: frontend/test/metabase-db/postgres
+          name: fe-tests-cypress-postgres
+          requires:
+            - build-uberjar
+            - fe-deps
+          e: fe-postgres-9-6
+          only-single-database: true
+          test-files-location: frontend/test/metabase-db/postgres
 
       - deploy-master:
           requires:
