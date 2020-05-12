@@ -8,6 +8,7 @@ import cx from "classnames";
 import { dissoc } from "icepick";
 
 import withToast from "metabase/hoc/Toast";
+import fitViewport from "metabase/hoc/FitViewPort";
 
 import Collection from "metabase/entities/collections";
 import Search from "metabase/entities/search";
@@ -23,14 +24,10 @@ import Card from "metabase/components/Card";
 import Modal from "metabase/components/Modal";
 import StackedCheckBox from "metabase/components/StackedCheckBox";
 import EntityItem from "metabase/components/EntityItem";
-import { Grid, GridItem } from "metabase/components/Grid";
 import Icon, { IconWrapper } from "metabase/components/Icon";
 import Link from "metabase/components/Link";
 import EntityMenu from "metabase/components/EntityMenu";
 import VirtualizedList from "metabase/components/VirtualizedList";
-import BrowserCrumbs from "metabase/components/BrowserCrumbs";
-import ItemTypeFilterBar from "metabase/components/ItemTypeFilterBar";
-import CollectionEmptyState from "metabase/components/CollectionEmptyState";
 import PageHeading from "metabase/components/PageHeading";
 import Tooltip from "metabase/components/Tooltip";
 
@@ -49,51 +46,32 @@ import PinPositionDropTarget from "metabase/containers/dnd/PinPositionDropTarget
 import PinDropTarget from "metabase/containers/dnd/PinDropTarget";
 import ItemsDragLayer from "metabase/containers/dnd/ItemsDragLayer";
 
-import EmptyState from "metabase/components/EmptyState";
+import UserAvatar from "metabase/components/UserAvatar";
 
 const ROW_HEIGHT = 72;
-const PAGE_PADDING = [2, 3, 4];
 
 const ANALYTICS_CONTEXT = "Collection Landing";
 
-const EmptyStateWrapper = ({ children }) => (
-  <Box p={5} w={1} h={"200px"}>
+const CollectionSidebar = ({ children }) => (
+  <Box w={300} px={2} ml={2} className="absolute left top bottom">
     {children}
   </Box>
 );
 
-const DashboardEmptyState = () => (
-  <EmptyStateWrapper>
-    <EmptyState
-      message={t`Dashboards let you collect and share data in one place.`}
-      illustrationElement={<Icon name="dashboard" size={32} />}
-    />
-  </EmptyStateWrapper>
+const CollectionContent = ({ children }) => (
+  <Box bg="white" ml={360} className="full-height border-left flex-full">
+    <Box w={"80%"} ml="auto" mr="auto">
+      {children}
+    </Box>
+  </Box>
 );
 
-const PulseEmptyState = () => (
-  <EmptyStateWrapper>
-    <EmptyState
-      message={t`Pulses let you send out the latest data to your team on a schedule via email or slack.`}
-      illustrationElement={<Icon name="pulse" size={32} />}
-    />
-  </EmptyStateWrapper>
+const Greeting = () => (
+  <Flex my={3} align="center">
+    <UserAvatar />
+    <h3 className="ml2 text-heavy">Hey there Kyle</h3>
+  </Flex>
 );
-
-const QuestionEmptyState = () => (
-  <EmptyStateWrapper>
-    <EmptyState
-      message={t`Questions are a saved look at your data.`}
-      illustrationElement={<Icon name="beaker" size={32} />}
-    />
-  </EmptyStateWrapper>
-);
-
-const EMPTY_STATES = {
-  dashboard: <DashboardEmptyState />,
-  pulse: <PulseEmptyState />,
-  card: <QuestionEmptyState />,
-};
 
 @Search.loadList({
   query: (state, props) => ({ collection: props.collectionId }),
@@ -192,10 +170,6 @@ class DefaultLanding extends React.Component {
     // const collectionWidth = unpinned.length > 0 ? [1, 1 / 3] : 1;
     // const itemWidth = unpinned.length > 0 ? [1, 2 / 3] : 0;
     // const collectionGridSize = unpinned.length > 0 ? 1 : [1, 1 / 4];
-    const collectionWidth = [1, 1 / 3];
-    const itemWidth = [1, 2 / 3];
-    const collectionGridSize = 1;
-
     let unpinnedItems = unpinned;
 
     if (location.query.type) {
@@ -241,309 +215,221 @@ class DefaultLanding extends React.Component {
     // new collection CTA
     // !collectionIsEmpty;
     return (
-      <Box>
-        <Box>
-          <Flex
-            align="center"
-            pt={2}
-            pb={3}
-            px={4}
-            bg={pinned.length ? color("bg-medium") : null}
-          >
-            <Box>
-              {/* <Box mb={1}>
-                <BrowserCrumbs
-                  analyticsContext={ANALYTICS_CONTEXT}
-                  crumbs={[
-                    ...ancestors.map(ancestor => ({
-                      title: (
-                        <CollectionDropTarget collection={ancestor} margin={8}>
-                          {ancestor.name}
-                        </CollectionDropTarget>
-                      ),
-                      to: Urls.collection(ancestor.id),
-                    })),
-                  ]}
-                />
-              </Box> */}
-              <Flex align="center">
-                {collection.description && (
-                  <Tooltip tooltip={collection.description}>
-                    <Icon
-                      name="info"
-                      ml={1}
-                      mt="4px"
-                      color={color("bg-dark")}
-                      hover={{ color: color("brand") }}
-                    />
+      <Box className="relative full-height flex flex-column flex-full">
+        {showSidebar && (
+          <CollectionSidebar>
+            <Greeting />
+            <CollectionList
+              analyticsContext={ANALYTICS_CONTEXT}
+              currentCollection={collection}
+              collections={collections}
+              isRoot={collectionId === "root"}
+              collectionAncestorTiers={collectionAncestorTiers}
+            />
+          </CollectionSidebar>
+        )}
+        <CollectionContent>
+          <Box>
+            <Flex align="center" pt={2} pb={3} px={4}>
+              <Flex ml="auto">
+                {isAdmin && !collection.personal_owner_id && (
+                  <Tooltip
+                    tooltip={t`Edit the permissions for this collection`}
+                  >
+                    <Link
+                      to={Urls.collectionPermissions(this.props.collectionId)}
+                    >
+                      <IconWrapper>
+                        <Icon name="lock" />
+                      </IconWrapper>
+                    </Link>
                   </Tooltip>
                 )}
-              </Flex>
-            </Box>
-
-            <Flex ml="auto">
-              {isAdmin && !collection.personal_owner_id && (
-                <Tooltip tooltip={t`Edit the permissions for this collection`}>
-                  <Link
-                    to={Urls.collectionPermissions(this.props.collectionId)}
-                  >
-                    <IconWrapper>
-                      <Icon name="lock" />
-                    </IconWrapper>
-                  </Link>
-                </Tooltip>
-              )}
-              {collection &&
-                collection.can_write &&
-                !collection.personal_owner_id && (
-                  <CollectionEditMenu
-                    collectionId={collectionId}
-                    isAdmin={isAdmin}
-                    isRoot={isRoot}
-                  />
-                )}
-              <Box ml={1}>
-                <CollectionBurgerMenu />
-              </Box>
-            </Flex>
-          </Flex>
-          <Box>
-            <Box>
-              <Box pt={[1, 2]} px={[2, 4]}>
-                <Grid>
-                  {showSidebar && (
-                    <GridItem w={collectionWidth}>
-                      <Box pr={2} className="relative">
-                        {/* <Box py={2}>
-                          <CollectionSectionHeading>
-                            {t`Collections`}
-                          </CollectionSectionHeading>
-                        </Box> */}
-                        <CollectionList
-                          analyticsContext={ANALYTICS_CONTEXT}
-                          currentCollection={collection}
-                          collections={collections}
-                          isRoot={collectionId === "root"}
-                          w={collectionGridSize}
-                          collectionAncestorTiers={collectionAncestorTiers}
-                        />
-                      </Box>
-                    </GridItem>
+                {collection &&
+                  collection.can_write &&
+                  !collection.personal_owner_id && (
+                    <CollectionEditMenu
+                      collectionId={collectionId}
+                      isAdmin={isAdmin}
+                      isRoot={isRoot}
+                    />
                   )}
-                  <GridItem w={itemWidth}>
-                    <PageHeading className="text-wrap">
-                      {collection.name}
-                    </PageHeading>
-                    {collectionHasPins ? (
-                      <Box
-                        px={PAGE_PADDING}
-                        pt={2}
-                        pb={3}
-                        bg={color("bg-medium")}
-                      >
-                        <PinDropTarget
-                          pinIndex={
-                            pinned[pinned.length - 1].collection_position + 1
-                          }
-                          noDrop
-                          marginLeft={8}
-                          marginRight={8}
-                        >
-                          <Grid>
-                            {pinned.map((item, index) => (
-                              <GridItem
-                                w={[1, 1 / 2]}
-                                className="relative"
-                                key={index}
-                              >
-                                <ItemDragSource
-                                  item={item}
-                                  collection={collection}
-                                >
-                                  <PinnedItem
-                                    key={`${item.model}:${item.id}`}
-                                    index={index}
-                                    item={item}
-                                    collection={collection}
-                                  />
-                                  <PinPositionDropTarget
-                                    pinIndex={item.collection_position}
-                                    left
-                                  />
-                                  <PinPositionDropTarget
-                                    pinIndex={item.collection_position + 1}
-                                    right
-                                  />
-                                </ItemDragSource>
-                              </GridItem>
-                            ))}
-                            {pinned.length % 2 === 1 ? (
-                              <GridItem w={1 / 4} className="relative">
-                                <PinPositionDropTarget
-                                  pinIndex={
-                                    pinned[pinned.length - 1]
-                                      .collection_position + 1
-                                  }
-                                />
-                              </GridItem>
-                            ) : null}
-                          </Grid>
-                        </PinDropTarget>
-                      </Box>
-                    ) : (
-                      <PinDropTarget pinIndex={1} hideUntilDrag>
-                        {({ hovered }) => (
-                          <div
-                            className={cx(
-                              "p2 flex layout-centered",
-                              hovered ? "text-brand" : "text-light",
-                            )}
-                          >
-                            <Icon name="pin" mr={1} />
-                            {t`Drag something here to pin it to the top`}
-                          </div>
-                        )}
-                      </PinDropTarget>
-                    )}
-                    {collectionHasItems && (
-                      <Box>
-                        {/* <ItemTypeFilterBar
+                <Box ml={1}>
+                  <CollectionBurgerMenu />
+                </Box>
+              </Flex>
+            </Flex>
+          </Box>
+          <PageHeading className="text-wrap">{collection.name}</PageHeading>
+          {collectionHasPins ? (
+            <Box pb={3}>
+              <PinDropTarget
+                pinIndex={pinned[pinned.length - 1].collection_position + 1}
+                noDrop
+                marginLeft={8}
+                marginRight={8}
+              >
+                {pinned.map((item, index) => (
+                  <ItemDragSource item={item} collection={collection}>
+                    <PinnedItem
+                      key={`${item.model}:${item.id}`}
+                      index={index}
+                      item={item}
+                      collection={collection}
+                    />
+                    <PinPositionDropTarget
+                      pinIndex={item.collection_position}
+                      left
+                    />
+                    <PinPositionDropTarget
+                      pinIndex={item.collection_position + 1}
+                      right
+                    />
+                  </ItemDragSource>
+                ))}
+                {pinned.length % 2 === 1 ? (
+                  <PinPositionDropTarget
+                    pinIndex={pinned[pinned.length - 1].collection_position + 1}
+                  />
+                ) : null}
+              </PinDropTarget>
+            </Box>
+          ) : (
+            <PinDropTarget pinIndex={1} hideUntilDrag>
+              {({ hovered }) => (
+                <div
+                  className={cx(
+                    "p2 flex layout-centered",
+                    hovered ? "text-brand" : "text-light",
+                  )}
+                >
+                  <Icon name="pin" mr={1} />
+                  {t`Drag something here to pin it to the top`}
+                </div>
+              )}
+            </PinDropTarget>
+          )}
+          {collectionHasItems && (
+            <Box>
+              {/* <ItemTypeFilterBar
                           analyticsContext={ANALYTICS_CONTEXT}
                         /> */}
-                        <Card mt={1} className="relative">
-                          {unpinnedItems.length > 0 ? (
-                            <PinDropTarget pinIndex={null} margin={8}>
-                              <Box
-                                style={{
-                                  position: "relative",
-                                  height: ROW_HEIGHT * unpinnedItems.length,
-                                }}
-                              >
-                                <VirtualizedList
-                                  items={unpinnedItems}
-                                  rowHeight={ROW_HEIGHT}
-                                  renderItem={({ item, index }) => (
-                                    <Box className="relative">
-                                      <ItemDragSource
-                                        item={item}
-                                        selection={selection}
-                                        collection={collection}
-                                      >
-                                        <NormalItem
-                                          key={`${item.model}:${item.id}`}
-                                          item={item}
-                                          collection={collection}
-                                          selection={selection}
-                                          onToggleSelected={onToggleSelected}
-                                          onMove={selectedItems =>
-                                            this.setState({
-                                              selectedItems,
-                                              selectedAction: "move",
-                                            })
-                                          }
-                                          onCopy={selectedItems =>
-                                            this.setState({
-                                              selectedItems,
-                                              selectedAction: "copy",
-                                            })
-                                          }
-                                        />
-                                      </ItemDragSource>
-                                    </Box>
-                                  )}
-                                />
-                              </Box>
-                            </PinDropTarget>
-                          ) : (
-                            <Box>
-                              {location.query.type &&
-                                EMPTY_STATES[location.query.type]}
-                              <PinDropTarget
-                                pinIndex={null}
-                                hideUntilDrag
-                                margin={10}
-                              >
-                                {({ hovered }) => (
-                                  <div
-                                    className={cx(
-                                      "m2 flex layout-centered",
-                                      hovered ? "text-brand" : "text-light",
-                                    )}
-                                  >
-                                    {t`Drag here to un-pin`}
-                                  </div>
-                                )}
-                              </PinDropTarget>
-                            </Box>
-                          )}
-                        </Card>
-                      </Box>
-                    )}
-                    {!collectionHasItems && !collectionHasPins && (
-                      <Box>
-                        <CollectionEmptyState />
-                      </Box>
-                    )}
-                  </GridItem>
-                </Grid>
-                {unpinned.length === 0 && (
-                  <PinDropTarget pinIndex={null} hideUntilDrag margin={10}>
-                    {({ hovered }) => (
-                      <Flex
-                        align="center"
-                        justify="center"
-                        py={2}
-                        m={2}
-                        color={hovered ? color("brand") : color("text-medium")}
-                      >
-                        {t`Drag here to un-pin`}
-                      </Flex>
-                    )}
+              <Box mt={1} className="relative">
+                {unpinnedItems.length > 0 ? (
+                  <PinDropTarget pinIndex={null} margin={8}>
+                    <Box
+                      style={{
+                        position: "relative",
+                        height: ROW_HEIGHT * unpinnedItems.length,
+                      }}
+                    >
+                      <VirtualizedList
+                        items={unpinnedItems}
+                        rowHeight={ROW_HEIGHT}
+                        renderItem={({ item, index }) => (
+                          <Box className="relative">
+                            <ItemDragSource
+                              item={item}
+                              selection={selection}
+                              collection={collection}
+                            >
+                              <NormalItem
+                                key={`${item.model}:${item.id}`}
+                                item={item}
+                                collection={collection}
+                                selection={selection}
+                                onToggleSelected={onToggleSelected}
+                                onMove={selectedItems =>
+                                  this.setState({
+                                    selectedItems,
+                                    selectedAction: "move",
+                                  })
+                                }
+                                onCopy={selectedItems =>
+                                  this.setState({
+                                    selectedItems,
+                                    selectedAction: "copy",
+                                  })
+                                }
+                              />
+                            </ItemDragSource>
+                          </Box>
+                        )}
+                      />
+                    </Box>
                   </PinDropTarget>
+                ) : (
+                  <Box>
+                    <PinDropTarget pinIndex={null} hideUntilDrag margin={10}>
+                      {({ hovered }) => (
+                        <div
+                          className={cx(
+                            "m2 flex layout-centered",
+                            hovered ? "text-brand" : "text-light",
+                          )}
+                        >
+                          {t`Drag here to un-pin`}
+                        </div>
+                      )}
+                    </PinDropTarget>
+                  </Box>
                 )}
-                {/*
+              </Box>
+            </Box>
+          )}
+          {!collectionHasItems && !collectionHasPins && (
+            <Box>Nothing to see here</Box>
+          )}
+          {unpinned.length === 0 && (
+            <PinDropTarget pinIndex={null} hideUntilDrag margin={10}>
+              {({ hovered }) => (
+                <Flex
+                  align="center"
+                  justify="center"
+                  py={2}
+                  m={2}
+                  color={hovered ? color("brand") : color("text-medium")}
+                >
+                  {t`Drag here to un-pin`}
+                </Flex>
+              )}
+            </PinDropTarget>
+          )}
+          {/*
                 {collectionIsEmpty && (
                   <Flex align="center" justify="center" w={1}>
                     <CollectionEmptyState />
                   </Flex>
                 )} */}
-              </Box>
-            </Box>
-            <BulkActionBar showing={selected.length > 0}>
-              {/* NOTE: these padding and grid sizes must be carefully matched
+        </CollectionContent>
+        <BulkActionBar showing={selected.length > 0}>
+          {/* NOTE: these padding and grid sizes must be carefully matched
                    to the main content above to ensure the bulk checkbox lines up */}
-              <Box px={[2, 4]} py={1}>
-                <Grid>
-                  <GridItem w={collectionWidth} />
-                  <GridItem w={itemWidth} px={[1, 2]}>
-                    <Flex align="center" justify="center" px={2}>
-                      <SelectionControls {...this.props} />
-                      <BulkActionControls
-                        onArchive={
-                          _.all(selected, item => item.setArchived)
-                            ? this.handleBulkArchive
-                            : null
-                        }
-                        onMove={
-                          _.all(selected, item => item.setCollection)
-                            ? this.handleBulkMoveStart
-                            : null
-                        }
-                      />
-                      <Box ml="auto">
-                        {ngettext(
-                          msgid`${selected.length} item selected`,
-                          `${selected.length} items selected`,
-                          selected.length,
-                        )}
-                      </Box>
-                    </Flex>
-                  </GridItem>
-                </Grid>
+          <Box px={[2, 4]} py={1}>
+            <Flex align="center" justify="center" px={2}>
+              <SelectionControls {...this.props} />
+              <BulkActionControls
+                onArchive={
+                  _.all(selected, item => item.setArchived)
+                    ? this.handleBulkArchive
+                    : null
+                }
+                onMove={
+                  _.all(selected, item => item.setCollection)
+                    ? this.handleBulkMoveStart
+                    : null
+                }
+              />
+              <Box ml="auto">
+                {ngettext(
+                  msgid`${selected.length} item selected`,
+                  `${selected.length} items selected`,
+                  selected.length,
+                )}
               </Box>
-            </BulkActionBar>
+            </Flex>
           </Box>
-        </Box>
+        </BulkActionBar>
         {!_.isEmpty(selectedItems) && selectedAction === "copy" && (
           <Modal onClose={this.handleCloseModal}>
             <CollectionCopyEntityModal
@@ -710,6 +596,7 @@ const SelectionControls = ({
       ),
   }),
 )
+@fitViewport
 class CollectionLanding extends React.Component {
   componentDidUpdate() {
     this.fetchAncestorTiers();
@@ -741,7 +628,7 @@ class CollectionLanding extends React.Component {
     }
 
     return (
-      <Box>
+      <Box className={cx("flex-column", this.props.fitClassNames)}>
         <DefaultLanding
           isRoot={isRoot}
           ancestors={ancestors}
