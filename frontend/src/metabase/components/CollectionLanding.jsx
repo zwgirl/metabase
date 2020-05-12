@@ -53,7 +53,12 @@ const ROW_HEIGHT = 72;
 const ANALYTICS_CONTEXT = "Collection Landing";
 
 const CollectionSidebar = ({ children }) => (
-  <Box w={300} px={2} ml={2} className="absolute left top bottom">
+  <Box
+    w={324}
+    px={2}
+    ml={2}
+    className="absolute left top bottom overflow-scroll"
+  >
     {children}
   </Box>
 );

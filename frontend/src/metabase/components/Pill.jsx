@@ -9,24 +9,26 @@ const DEFAULT_PILL_COLOR = metabaseColor("brand");
 export const Pill = styled.div`
   ${space};
   ${background};
-  ${color};
   ${display};
+  color: ${props => (props.active ? "white" : DEFAULT_PILL_COLOR)};
   width: 100%;
   border-radius: 99px;
   font-weight: bold;
+  background-color: ${props =>
+    props.active ? metabaseColor("brand") : alpha(metabaseColor("brand"), 0.2)};
   z-index: 2;
   &:hover {
     cursor: pointer;
     background-color: ${props =>
-      props.active ? alpha(props.color, 0.8) : alpha(props.color, 0.35)};
-    color: ${props => (props.active ? "white" : props.color)};
+      props.active
+        ? alpha(DEFAULT_PILL_COLOR, 0.8)
+        : alpha(DEFAULT_PILL_COLOR, 0.35)};
+    color: ${props => (props.active ? "white" : DEFAULT_PILL_COLOR)};
     transition: background;
   }
 `;
 
 Pill.defaultProps = {
-  bg: alpha(metabaseColor("brand"), 0.2),
-  color: DEFAULT_PILL_COLOR,
   py: "12px",
   pl: "36px",
   pr: "36px",
