@@ -4,10 +4,15 @@
     "transform-flow-strip-types",
     "add-react-displayname",
     "transform-decorators-legacy",
-    ["transform-builtin-extend", {
+    [
+      "transform-builtin-extend",
+      {
         "globals": ["Error", "Array"]
-    }],
-    "syntax-trailing-function-commas"
+      }
+    ],
+    "syntax-trailing-function-commas",
+    "transform-class-properties",
+    "istanbul"
   ],
   "presets": ["es2015", "stage-0", "react"],
   "env": {
@@ -16,13 +21,16 @@
     },
     "extract": {
       "plugins": [
-        ["ttag", {
-          "extract": {
-            "output": "locales/metabase-frontend.pot"
-          },
-          "discover": ["t", "jt"],
-          "numberedExpressions": true
-        }]
+        [
+          "ttag",
+          {
+            "extract": {
+              "output": "locales/metabase-frontend.pot"
+            },
+            "discover": ["t", "jt"],
+            "numberedExpressions": true
+          }
+        ]
       ]
     }
   }
