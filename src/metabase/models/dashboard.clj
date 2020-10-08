@@ -75,7 +75,6 @@
                                [PulseCard :pc] [:= :pc.dashboard_card_id :dc.id]
                                [Pulse :p] [:= :p.id :pc.pulse_id]]
                    :where     [:= :d.id (:id dashboard)]})]
-    (println affected)
     (when (seq affected)
       (db/update-where! Pulse {:id [:in (map :id affected)]}
                         :name (:name dashboard)))))
