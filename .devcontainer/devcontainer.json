@@ -1,6 +1,18 @@
 {
   "name": "Metadev",
-  "build": { "dockerfile": "Dockerfile" },
-  "extensions": ["dbaeumer.vscode-eslint"],
-  "forwardPorts": [3000]
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "extensions": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode"
+  ],
+  "forwardPorts": [
+    3000
+  ],
+  "remoteUser": "vscode",
+  "mounts": [
+    "source=metabase-src-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+  ],
+  "postCreateCommand": "sudo chown vscode node_modules && yarn install && lein deps"
 }
