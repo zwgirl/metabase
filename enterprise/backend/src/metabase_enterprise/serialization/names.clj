@@ -82,9 +82,10 @@
 
 (defmethod fully-qualified-name* (type Dashboard)
   [dashboard]
-  (format "%s/dashboards/%s"
+  (format "%s/dashboards/%d-%s"
           (or (some->> dashboard :collection_id (fully-qualified-name Collection))
               "/collections/root")
+          (:id dashboard)
           (safe-name dashboard)))
 
 (defmethod fully-qualified-name* (type Pulse)
@@ -201,7 +202,7 @@
   [context _ dashboard-name]
   (assoc context :dashboard (db/select-one-id Dashboard
                               :collection_id (:collection context)
-                              :name          dashboard-name)))
+                              :name          (id-name->name dashboard-name))))
 
 (defmethod path->context* "pulses"
   [context _ pulse-name]
