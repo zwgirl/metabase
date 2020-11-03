@@ -18,10 +18,12 @@
   (let [n "foo/bar baz"]
     (is (-> {:name n} safe-name unescape-name (= n)))))
 
-(defn- test-fully-qualified-name-roundtrip
+(defmacro test-fully-qualified-name-roundtrip
   [entity]
-  (let [context (fully-qualified-name->context (fully-qualified-name entity))]
-    (is (= (u/get-id entity) ((some-fn :field :metric :segment :card :dashboard :collection :table :database) context)))))
+  `(testing (str "roundtrip for " ~entity)
+     (is (= (u/get-id ~entity)
+              ((some-fn :field :metric :segment :card :dashboard :collection :table :database)
+               (fully-qualified-name->context (fully-qualified-name ~entity)))))))
 
 (deftest roundtrip-test
   (ts/with-world

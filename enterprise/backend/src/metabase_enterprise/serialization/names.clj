@@ -64,11 +64,11 @@
 
 (defmethod fully-qualified-name* (type Metric)
   [metric]
-  (str (->> metric :table_id (fully-qualified-name Table)) "/metrics/" (safe-name metric)))
+  (str (->> metric :table_id (fully-qualified-name Table)) "/metrics/" (:id metric) "-" (safe-name metric)))
 
 (defmethod fully-qualified-name* (type Segment)
   [segment]
-  (str (->> segment :table_id (fully-qualified-name Table)) "/segments/" (safe-name segment)))
+  (str (->> segment :table_id (fully-qualified-name Table)) "/segments/" (:id segment) "-" (safe-name segment)))
 
 (defmethod fully-qualified-name* (type Collection)
   [collection]
@@ -89,14 +89,15 @@
 
 (defmethod fully-qualified-name* (type Pulse)
   [pulse]
-  (format "%s/pulses/%s"
+  (format "%s/pulses/%d-%s"
           (or (some->> pulse :collection_id (fully-qualified-name Collection))
               "/collections/root")
+          (:id pulse)
           (safe-name pulse)))
 
 (defmethod fully-qualified-name* (type Card)
   [card]
-  (format "%s/cards/%s"
+  (format "%s/cards/%d-%s"
           (or (some->> card
                        :dataset_query
                        qp.util/query->source-card-id
@@ -105,6 +106,7 @@
                        :collection_id
                        (fully-qualified-name Collection))
               "/collections/root")
+          (:id card)
           (safe-name card)))
 
 (defmethod fully-qualified-name* (type User)
@@ -163,17 +165,24 @@
   [context _ field-name]
   (path->context* context "fields" field-name))
 
+(defn- id-name->name
+  [name]
+  (when-let [n (re-matches #"\d+-(.*)" name)]
+    (if (= 1 (count n))
+      n
+      (second n))))
+
 (defmethod path->context* "metrics"
   [context _ metric-name]
   (assoc context :metric (db/select-one-id Metric
                            :table_id (:table context)
-                           :name     metric-name)))
+                           :name     (id-name->name metric-name))))
 
 (defmethod path->context* "segments"
   [context _ segment-name]
   (assoc context :segment (db/select-one-id Segment
-                            :table_id (:table context)
-                            :name     segment-name)))
+                              :table_id (:table context)
+                              :name     (id-name->name segment-name))))
 
 (defmethod path->context* "collections"
   [context _ collection-name]
@@ -201,10 +210,10 @@
                               :name          pulse-name)))
 
 (defmethod path->context* "cards"
-  [context _ dashboard-name]
+  [context _ card-name]
   (assoc context :card (db/select-one-id Card
                          :collection_id (:collection context)
-                         :name          dashboard-name)))
+                         :name          (id-name->name card-name))))
 
 (defmethod path->context* "users"
   [context _ email]
@@ -214,7 +223,7 @@
 (def ^:private separator-pattern #"\/")
 
 (defn fully-qualified-name->context
-  "Parse a logcial path into a context map."
+  "Parse a logical path into a context map."
   [fully-qualified-name]
   (when fully-qualified-name
     (let [context (->> (str/split fully-qualified-name separator-pattern)
@@ -226,11 +235,11 @@
       (try
         (s/validate (s/maybe Context) context)
         (catch Exception e
-          (ex-info (trs "Can''t resolve {0} in fully qualified name {1}"
-                        (str/join ", " (map name (keys (:value (ex-data e)))))
-                        fully-qualified-name)
-            {:fully-qualified-name fully-qualified-name
-             :context              context}))))))
+          (throw (ex-info (trs "Can''t resolve {0} in fully qualified name {1}"
+                               (str/join ", " (map name (keys (:value (ex-data e)))))
+                               fully-qualified-name)
+                          {:fully-qualified-name fully-qualified-name
+                           :context              context})))))))
 
 (defn name-for-logging
   "Return a string representation of entity suitable for logs"
