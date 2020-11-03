@@ -1,5 +1,5 @@
 (ns metabase-enterprise.serialization.names-test
-  (:require [expectations :refer :all]
+  (:require [clojure.test :refer :all]
             [metabase
              [models :refer [Card Collection Dashboard Database Field Metric Segment Table]]
              [util :as u]]
@@ -7,62 +7,52 @@
              [names :as names :refer :all]
              [test-util :as ts]]))
 
-(expect
-  (= (safe-name {:name "foo"}) "foo"))
-(expect
-  (= (safe-name {:name "foo/bar baz"}) "foo%2Fbar baz"))
+(deftest safe-name-test
+  (is (= (safe-name {:name "foo"}) "foo"))
+  (is (= (safe-name {:name "foo/bar baz"}) "foo%2Fbar baz")))
 
-(expect
-  (= (unescape-name "foo") "foo"))
-(expect
-  (= (unescape-name "foo%2Fbar baz") "foo/bar baz"))
+(deftest unescape-name-test
+  (is (= (unescape-name "foo") "foo"))
+  (is (= (unescape-name "foo%2Fbar baz") "foo/bar baz"))
 
-(expect
   (let [n "foo/bar baz"]
-    (= (-> {:name n} safe-name unescape-name (= n)))))
+    (is (-> {:name n} safe-name unescape-name (= n)))))
 
 (defn- test-fully-qualified-name-roundtrip
   [entity]
   (let [context (fully-qualified-name->context (fully-qualified-name entity))]
-    (= (u/get-id entity) ((some-fn :field :metric :segment :card :dashboard :collection :table :database) context))))
+    (is (= (u/get-id entity) ((some-fn :field :metric :segment :card :dashboard :collection :table :database) context)))))
 
-(expect
+(deftest roundtrip-test
   (ts/with-world
-    (test-fully-qualified-name-roundtrip (Card card-id-root))))
-(expect
-  (ts/with-world
-    (test-fully-qualified-name-roundtrip (Card card-id))))
-(expect
-  (ts/with-world
-    (test-fully-qualified-name-roundtrip (Card card-id-nested))))
+    (test-fully-qualified-name-roundtrip (Card card-id-root)))
 
-(expect
   (ts/with-world
-    (test-fully-qualified-name-roundtrip (Table table-id))))
+    (test-fully-qualified-name-roundtrip (Card card-id)))
 
-(expect
   (ts/with-world
-    (test-fully-qualified-name-roundtrip (Field category-field-id))))
+    (test-fully-qualified-name-roundtrip (Card card-id-nested)))
 
-(expect
   (ts/with-world
-    (test-fully-qualified-name-roundtrip (Metric metric-id))))
+    (test-fully-qualified-name-roundtrip (Table table-id)))
 
-(expect
   (ts/with-world
-    (test-fully-qualified-name-roundtrip (Segment segment-id))))
+    (test-fully-qualified-name-roundtrip (Field category-field-id)))
 
-(expect
   (ts/with-world
-    (test-fully-qualified-name-roundtrip (Collection collection-id))))
-(expect
-  (ts/with-world
-    (test-fully-qualified-name-roundtrip (Collection collection-id-nested))))
+    (test-fully-qualified-name-roundtrip (Metric metric-id)))
 
-(expect
   (ts/with-world
-    (test-fully-qualified-name-roundtrip (Dashboard dashboard-id))))
+    (test-fully-qualified-name-roundtrip (Segment segment-id)))
 
-(expect
+  (ts/with-world
+    (test-fully-qualified-name-roundtrip (Collection collection-id)))
+
+  (ts/with-world
+    (test-fully-qualified-name-roundtrip (Collection collection-id-nested)))
+
+  (ts/with-world
+    (test-fully-qualified-name-roundtrip (Dashboard dashboard-id)))
+
   (ts/with-world
     (test-fully-qualified-name-roundtrip (Database db-id))))

@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [load])
   (:require [clojure.data :as diff]
             [clojure.java.io :as io]
-            [expectations :refer [expect]]
+            [clojure.test :refer :all]
             [metabase
              [models :refer [Card Collection Dashboard DashboardCard DashboardCardSeries Database Dependency Dimension
                              Field FieldValues Metric Pulse PulseCard PulseChannel Segment Table User]]
@@ -38,11 +38,11 @@
                     (vector :in)
                     (db/delete! model# :id)))))))
 
-(expect
+(deftest load-test
   (try
     ;; in case it already exists
     (u/ignore-exceptions
-      (delete-directory! dump-dir))
+     (delete-directory! dump-dir))
     (let [fingerprint (ts/with-world
                         (dump dump-dir (:email (test-users/fetch-user :crowberto)))
                         [[Database      (Database db-id)]
@@ -60,9 +60,9 @@
                          [DashboardCard (DashboardCard dashcard-id)]])]
       (with-world-cleanup
         (load dump-dir {:on-error :abort :mode :skip})
-        (every? (fn [[model entity]]
-                  (or (-> entity :name nil?)
-                      (db/select-one model :name (:name entity))))
-                fingerprint)))
+        (is (every? (fn [[model entity]]
+                      (or (-> entity :name nil?)
+                          (db/select-one model :name (:name entity))))
+                    fingerprint))))
     (finally
       (delete-directory! dump-dir))))
