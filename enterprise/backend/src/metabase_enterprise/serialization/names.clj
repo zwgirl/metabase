@@ -72,13 +72,14 @@
 
 (defmethod fully-qualified-name* (type Collection)
   [collection]
-  (let [parents (some->> (str/split (:location collection) #"/")
+  (let [->id-name (fn [coll] (format "%d-%s" (:id coll) (safe-name coll)))
+        parents (some->> (str/split (:location collection) #"/")
                          rest
                          not-empty
-                         (map #(-> % Integer/parseInt Collection safe-name (str "/collections")))
+                         (map #(-> % Integer/parseInt Collection ->id-name (str "/collections")))
                          (str/join "/")
                          (format "%s/"))]
-    (str "/collections/root/collections/" parents (safe-name collection))))
+    (str "/collections/root/collections/" parents (->id-name collection))))
 
 (defmethod fully-qualified-name* (type Dashboard)
   [dashboard]
@@ -190,7 +191,7 @@
   (if (= collection-name "root")
     (assoc context :collection nil)
     (assoc context :collection (db/select-one-id Collection
-                                 :name     collection-name
+                                 :name     (id-name->name collection-name)
                                  :location (or (some-> context
                                                        :collection
                                                        Collection
