@@ -6,7 +6,7 @@
              [java :as java]]))
 
 (def ^:private required-commands
-  ["git" "node" "yarn" "aws" "docker" "java" "wget" "shasum" "gettext" "zip"])
+  ["git" "node" "yarn" "aws" "docker" "java" "wget" "gettext" "zip"])
 
 (defn- check-for-required-commands []
   (u/step "Verify required external commands are available"
