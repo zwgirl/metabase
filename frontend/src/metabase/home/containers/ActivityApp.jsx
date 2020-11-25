@@ -42,9 +42,9 @@ export default class HomepageApp extends Component {
     fetchRecentViews: PropTypes.func.isRequired,
   };
 
-    state = {
-      onboarding: props.showOnboarding,
-   }
+  state = {
+    onboarding: props.showOnboarding,
+  };
 
   completeOnboarding() {
     this.setState({ onboarding: false });
@@ -66,9 +66,9 @@ export default class HomepageApp extends Component {
         <Box py={3}>
           <Subhead>{t`Activity`}</Subhead>
         </Box>
-          <Box w={2 / 3} ml="auto" mr="auto">
-            <Activity {...this.props} />
-          </Box>
+        <Box w={2 / 3} ml="auto" mr="auto">
+          <Activity {...this.props} />
+        </Box>
       </Box>
     );
   }
