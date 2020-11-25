@@ -1,12 +1,12 @@
 import React from "react";
 import { Box } from "grid-styled";
-import { Link } from "react-router";
-import Icon from "metabase/components/Icon";
 
 import { color } from "metabase/lib/colors";
 
 import AdminChecklist from "metabase/entities/admin-checklist";
 
+import Icon from "metabase/components/Icon";
+import Link from "metabase/components/Link";
 import Subhead from "metabase/components/type/Subhead";
 
 const TaskList = ({ tasks }) => (

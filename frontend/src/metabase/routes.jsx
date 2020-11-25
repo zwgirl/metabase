@@ -208,13 +208,12 @@ export const getRoutes = store => (
           <Route path="setup-checklist" component={ChecklistApp} />
           <Route path="xrays" component={ExploreApp} />
           <Route path="start" component={GuideApp} />
+          <Route path="search" title={t`Search`} component={SearchApp} />
+          <Route path="archive" title={t`Archive`} component={ArchiveApp} />
         </Route>
 
         <Route path="/explore" component={PostSetupApp} />
         <Route path="/explore/:databaseId" component={PostSetupApp} />
-
-        <Route path="search" title={t`Search`} component={SearchApp} />
-        <Route path="archive" title={t`Archive`} component={ArchiveApp} />
 
         <Route path="collection/users" component={IsAdmin}>
           <IndexRoute component={UserCollectionList} />
