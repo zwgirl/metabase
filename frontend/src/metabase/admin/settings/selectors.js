@@ -18,7 +18,6 @@ import FormattingWidget from "./components/widgets/FormattingWidget";
 
 import SettingsUpdatesForm from "./components/SettingsUpdatesForm";
 import SettingsEmailForm from "./components/SettingsEmailForm";
-import SettingsSetupList from "./components/SettingsSetupList";
 import SettingsSlackForm from "./components/SettingsSlackForm";
 
 import { UtilApi } from "metabase/services";
@@ -33,11 +32,6 @@ function updateSectionsWithPlugins(sections) {
 }
 
 const SECTIONS = updateSectionsWithPlugins({
-  setup: {
-    name: t`Setup`,
-    settings: [],
-    component: SettingsSetupList,
-  },
   general: {
     name: t`General`,
     settings: [

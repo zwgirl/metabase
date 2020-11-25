@@ -135,7 +135,7 @@ const getRoutes = (store, IsAdmin) => (
 
     {/* SETTINGS */}
     <Route path="settings" title={t`Settings`}>
-      <IndexRedirect to="setup" />
+      <IndexRedirect to="general" />
       <Route path="*" component={SettingsEditorApp} />
     </Route>
 
