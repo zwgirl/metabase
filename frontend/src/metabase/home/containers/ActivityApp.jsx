@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { t } from "ttag";
-import { push } from "react-router-redux";
 
 import Modal from "metabase/components/Modal";
 import Subhead from "metabase/components/Subhead";
@@ -13,7 +12,7 @@ import NewUserOnboardingModal from "../components/NewUserOnboardingModal";
 import * as homepageActions from "../actions";
 import { getActivity, getRecentViews, getUser } from "../selectors";
 
-import { Box, Flex } from "grid-styled";
+import { Box } from "grid-styled";
 
 const mapStateToProps = (state, props) => ({
   activity: getActivity(state),
@@ -42,9 +41,12 @@ export default class HomepageApp extends Component {
     fetchRecentViews: PropTypes.func.isRequired,
   };
 
-  state = {
-    onboarding: props.showOnboarding,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      onboarding: props.showOnboarding,
+    };
+  }
 
   completeOnboarding() {
     this.setState({ onboarding: false });
