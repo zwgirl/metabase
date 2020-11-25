@@ -4,15 +4,11 @@ import { connect } from "react-redux";
 import { t } from "ttag";
 import { push } from "react-router-redux";
 
-import Greeting from "metabase/lib/greeting";
 import Modal from "metabase/components/Modal";
-import Card from "metabase/components/Card";
 import Subhead from "metabase/components/Subhead";
 
 import Activity from "../components/Activity";
-import RecentViews from "../components/RecentViews";
 import NewUserOnboardingModal from "../components/NewUserOnboardingModal";
-import NextStep from "../components/NextStep";
 
 import * as homepageActions from "../actions";
 import { getActivity, getRecentViews, getUser } from "../selectors";
@@ -28,7 +24,6 @@ const mapStateToProps = (state, props) => ({
 
 const mapDispatchToProps = {
   ...homepageActions,
-  onChangeLocation: push,
 };
 
 @connect(
@@ -37,7 +32,6 @@ const mapDispatchToProps = {
 )
 export default class HomepageApp extends Component {
   static propTypes = {
-    onChangeLocation: PropTypes.func.isRequired,
     showOnboarding: PropTypes.bool.isRequired,
     user: PropTypes.object.isRequired,
     // TODO - these should be used by their call sites rather than passed
@@ -48,13 +42,9 @@ export default class HomepageApp extends Component {
     fetchRecentViews: PropTypes.func.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      greeting: Greeting.sayHello(props.user && props.user.first_name),
+    state = {
       onboarding: props.showOnboarding,
-    };
-  }
+   }
 
   completeOnboarding() {
     this.setState({ onboarding: false });
@@ -76,17 +66,9 @@ export default class HomepageApp extends Component {
         <Box py={3}>
           <Subhead>{t`Activity`}</Subhead>
         </Box>
-        <Flex>
-          <Box w={2 / 3}>
-            <Card px={1}>
-              <Activity {...this.props} />
-            </Card>
+          <Box w={2 / 3} ml="auto" mr="auto">
+            <Activity {...this.props} />
           </Box>
-          <Box w={1 / 3}>
-            <NextStep />
-            <RecentViews {...this.props} />
-          </Box>
-        </Flex>
       </Box>
     );
   }

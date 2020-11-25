@@ -15,7 +15,7 @@ import MetabaseSettings from "metabase/lib/settings";
 
 import App from "metabase/App.jsx";
 
-import HomepageApp from "metabase/home/containers/HomepageApp";
+import ActivityApp from "metabase/home/containers/ActivityApp";
 
 // auth containers
 import AuthApp from "metabase/auth/AuthApp";
@@ -204,7 +204,7 @@ export const getRoutes = store => (
             <ModalRoute path="permissions" modal={CollectionPermissionsModal} />
           </Route>
 
-          <Route path="activity" component={HomepageApp} />
+          <Route path="activity" component={ActivityApp} />
           <Route path="setup-checklist" component={ChecklistApp} />
           <Route path="xrays" component={ExploreApp} />
           <Route path="start" component={GuideApp} />
