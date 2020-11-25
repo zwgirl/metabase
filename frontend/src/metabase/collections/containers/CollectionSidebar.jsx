@@ -83,7 +83,7 @@ class CollectionSidebar extends React.Component {
         </Box>
         <Box my={2}>
           <CollectionLink to={`/setup-checklist`}>
-            <Icon name="star" mr={1} />
+            <Icon name="check" mr={1} />
             {t`Setup checklist`}
           </CollectionLink>
           <CollectionLink to={`/xrays`}>

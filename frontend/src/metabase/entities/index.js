@@ -19,3 +19,5 @@ export groups from "./groups";
 
 export search from "./search";
 export snippets from "./snippets";
+
+export adminChecklist from "./admin-checklist";

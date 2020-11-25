@@ -35,6 +35,15 @@ export const MetricSchema = new schema.Entity("metrics");
 export const SnippetSchema = new schema.Entity("snippets");
 export const SnippetCollectionSchema = new schema.Entity("snippetCollections");
 
+export const AdminChecklistSchema = new schema.Entity(
+  "adminChecklist",
+  undefined,
+  {
+    // the admin_checklist endpoint doesn't return items with IDs so we have to create our own keys for
+    // the entity to hold on to in redux
+    idAttribute: ({ name }) => name.replace(" ", "-").toLowerCase(),
+  },
+);
 DatabaseSchema.define({
   tables: [TableSchema],
   schemas: [SchemaSchema],
