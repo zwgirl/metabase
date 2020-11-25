@@ -51,11 +51,11 @@ const ANALYTICS_CONTEXT = "Collection Landing";
 const ROW_HEIGHT = 72;
 
 @Search.loadList({
-  query: (state, props) => ({ collection: props.collectionId }),
+  query: (state, props) => ({ collection: props.params.collectionId }),
   wrapped: true,
 })
 @Collection.load({
-  id: (state, props) => props.collectionId,
+  id: (state, props) => props.params.collectionId,
   reload: true,
 })
 @connect((state, props) => {
@@ -133,17 +133,17 @@ export default class CollectionContent extends React.Component {
   render() {
     const {
       collection,
-      collectionId,
 
+      params: { collectionId },
       pinned,
       unpinned,
 
       isAdmin,
-      isRoot,
       selected,
       selection,
       onToggleSelected,
       location,
+      children, // needed for modals
     } = this.props;
     const { selectedItems, selectedAction } = this.state;
 
@@ -157,6 +157,9 @@ export default class CollectionContent extends React.Component {
     }
 
     const collectionHasPins = pinned.length > 0;
+
+    // TODO - this is duplicated in the sidebar as well
+    const isRoot = collectionId === "root";
 
     return (
       <Box pt={2}>
@@ -440,6 +443,10 @@ export default class CollectionContent extends React.Component {
           </Modal>
         )}
         <ItemsDragLayer selected={selected} />
+        {
+          // needed for modals
+          children
+        }
       </Box>
     );
   }

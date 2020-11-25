@@ -38,11 +38,17 @@ import {
 
 import QueryBuilder from "metabase/query_builder/containers/QueryBuilder";
 
+import CollectionContent from "metabase/collections/containers/CollectionContent";
 import CollectionEdit from "metabase/collections/containers/CollectionEdit";
 import CollectionCreate from "metabase/collections/containers/CollectionCreate";
 import ArchiveCollectionModal from "metabase/components/ArchiveCollectionModal";
 import CollectionPermissionsModal from "metabase/admin/permissions/containers/CollectionPermissionsModal";
 import UserCollectionList from "metabase/containers/UserCollectionList";
+
+// Cold start experience
+import ChecklistApp from "metabase/home/containers/ChecklistApp";
+import ExploreApp from "metabase/home/containers/ExploreApp";
+import GuideApp from "metabase/home/containers/GuideApp";
 
 import PulseEditApp from "metabase/pulse/containers/PulseEditApp";
 import SetupApp from "metabase/setup/containers/SetupApp";
@@ -88,7 +94,6 @@ import DashboardDetailsModal from "metabase/dashboard/components/DashboardDetail
 import { ModalRoute } from "metabase/hoc/ModalRoute";
 
 import CollectionLanding from "metabase/components/CollectionLanding";
-import Overworld from "metabase/containers/Overworld";
 
 import ArchiveApp from "metabase/home/containers/ArchiveApp";
 import SearchApp from "metabase/home/containers/SearchApp";
@@ -182,14 +187,28 @@ export const getRoutes = store => (
         {/* The global all hands rotues, things in here are for all the folks */}
         <Route
           path="/"
-          component={Overworld}
+          component={CollectionLanding}
           onEnter={(nextState, replace) => {
             const page = PLUGIN_LANDING_PAGE[0] && PLUGIN_LANDING_PAGE[0]();
             if (page && page !== "/") {
               replace(page);
             }
           }}
-        />
+        >
+          <IndexRedirect to="/collection/root" />
+          <Route path="collection/:collectionId" component={CollectionContent}>
+            <ModalRoute path="edit" modal={CollectionEdit} />
+            <ModalRoute path="archive" modal={ArchiveCollectionModal} />
+            <ModalRoute path="new_collection" modal={CollectionCreate} />
+            <ModalRoute path="new_dashboard" modal={CreateDashboardModal} />
+            <ModalRoute path="permissions" modal={CollectionPermissionsModal} />
+          </Route>
+
+          <Route path="activity" component={HomepageApp} />
+          <Route path="setup-checklist" component={ChecklistApp} />
+          <Route path="xrays" component={ExploreApp} />
+          <Route path="start" component={GuideApp} />
+        </Route>
 
         <Route path="/explore" component={PostSetupApp} />
         <Route path="/explore/:databaseId" component={PostSetupApp} />
@@ -200,16 +219,6 @@ export const getRoutes = store => (
         <Route path="collection/users" component={IsAdmin}>
           <IndexRoute component={UserCollectionList} />
         </Route>
-
-        <Route path="collection/:collectionId" component={CollectionLanding}>
-          <ModalRoute path="edit" modal={CollectionEdit} />
-          <ModalRoute path="archive" modal={ArchiveCollectionModal} />
-          <ModalRoute path="new_collection" modal={CollectionCreate} />
-          <ModalRoute path="new_dashboard" modal={CreateDashboardModal} />
-          <ModalRoute path="permissions" modal={CollectionPermissionsModal} />
-        </Route>
-
-        <Route path="activity" component={HomepageApp} />
 
         <Route
           path="dashboard/:dashboardId"

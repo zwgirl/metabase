@@ -3,13 +3,16 @@ import { connect } from "react-redux";
 import { Box } from "grid-styled";
 import { t } from "ttag";
 import styled from "styled-components";
+import { createSelector } from "reselect";
 
 import * as Urls from "metabase/lib/urls";
+import Greeting from "metabase/lib/greeting";
 
 import Collection from "metabase/entities/collections";
 
 import Icon from "metabase/components/Icon";
 import Link from "metabase/components/Link";
+import Subhead from "metabase/components/type/Subhead";
 
 import CollectionsList from "metabase/collections/components/CollectionsList";
 import CollectionLink from "metabase/collections/components/CollectionLink";
@@ -21,7 +24,15 @@ import {
   getParentPath,
 } from "metabase/collections/utils";
 
-const getCurrentUser = ({ currentUser }) => ({ currentUser });
+const greeting = createSelector(
+  [state => state.currentUser],
+  currentUser => Greeting.sayHello(currentUser.first_name),
+);
+
+const mapStateToProps = state => ({
+  currentUser: state.currentUser,
+  greeting: greeting(state),
+});
 
 // TODO - what's different about this from another sidebar component?
 const Sidebar = styled(Box)`
@@ -64,9 +75,26 @@ class CollectionSidebar extends React.Component {
     }
   }
   render() {
-    const { currentUser, isRoot, collectionId, list } = this.props;
+    const { currentUser, greeting, isRoot, collectionId, list } = this.props;
     return (
       <Sidebar w={340} pt={3}>
+        <Box px={SIDEBAR_SPACER * 2}>
+          <Subhead>{greeting}</Subhead>
+        </Box>
+        <Box my={2}>
+          <CollectionLink to={`/setup-checklist`}>
+            <Icon name="star" mr={1} />
+            {t`Setup checklist`}
+          </CollectionLink>
+          <CollectionLink to={`/xrays`}>
+            <Icon name="star" mr={1} />
+            {t`Look what we found`}
+          </CollectionLink>
+          <CollectionLink to={`/start`}>
+            <Icon name="star" mr={1} />
+            {t`Start here`}
+          </CollectionLink>
+        </Box>
         <CollectionLink
           to={Urls.collection("root")}
           selected={isRoot}
@@ -107,6 +135,13 @@ class CollectionSidebar extends React.Component {
 
         <Box className="mt-auto" pb={2} pl={SIDEBAR_SPACER * 2}>
           <Link
+            to={`/activity`}
+            className="flex align-center text-bold text-light text-brand-hover"
+          >
+            <Icon name="pulse" mr={1} />
+            {t`Activity`}
+          </Link>
+          <Link
             to={`/archive`}
             className="flex align-center text-bold text-light text-brand-hover"
           >
@@ -119,4 +154,4 @@ class CollectionSidebar extends React.Component {
   }
 }
 
-export default connect(getCurrentUser)(CollectionSidebar);
+export default connect(mapStateToProps)(CollectionSidebar);
