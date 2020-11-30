@@ -174,7 +174,7 @@ export default class Setup extends Component {
                   <div className="pt4 pb2">
                     {/* We use <a> rather than <Link> because we want a full refresh in case locale changed. */}
                     <a
-                      href="/"
+                      href="/start"
                       className="Button Button--primary"
                     >{t`Take me to Metabase`}</a>
                   </div>
