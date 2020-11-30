@@ -40,7 +40,7 @@ const GuideApp = () => (
           );
         }}
       </CandidateListLoader>
-      <Box>
+      <Box mt={3}>
         <Database.ListLoader>
           {({ databases }) => {
             if (databases.length === 0) {
