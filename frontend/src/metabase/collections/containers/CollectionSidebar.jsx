@@ -34,6 +34,43 @@ const mapStateToProps = state => ({
   greeting: greeting(state),
 });
 
+const SIDEBAR_LOCAL_STORAGE_KEY = "MB_SIDEBAR_VARIANT";
+
+const Variant1 = () => (
+  <span>
+    <CollectionLink to={`/start`}>
+      <Icon name="star" mr={1} />
+      {t`Start here`}
+    </CollectionLink>
+    <CollectionLink to={`/setup-checklist`}>
+      <Icon name="check" mr={1} />
+      {t`Setup checklist`}
+    </CollectionLink>
+  </span>
+);
+
+const getSidebarVariant = () =>
+  window.localStorage.getItem(SIDEBAR_LOCAL_STORAGE_KEY);
+
+const testVariant = variant => getSidebarVariant() === variant;
+
+Variant1.shouldRender = () => testVariant("1");
+
+const Variant2 = () => (
+  <span>
+    <CollectionLink to={`/setup-checklist`}>
+      <Icon name="check" mr={1} />
+      {t`Setup checklist`}
+    </CollectionLink>
+    <CollectionLink to={`/xrays`}>
+      <Icon name="bolt" mr={1} />
+      {t`Quick start dashboards`}
+    </CollectionLink>
+  </span>
+);
+
+Variant2.shouldRender = () => testVariant("2");
+
 // TODO - what's different about this from another sidebar component?
 const Sidebar = styled(Box)`
   position: fixed;
@@ -82,18 +119,8 @@ class CollectionSidebar extends React.Component {
           <Subhead>{greeting}</Subhead>
         </Box>
         <Box my={2}>
-          <CollectionLink to={`/start`}>
-            <Icon name="star" mr={1} />
-            {t`Start here`}
-          </CollectionLink>
-          <CollectionLink to={`/setup-checklist`}>
-            <Icon name="check" mr={1} />
-            {t`Setup checklist`}
-          </CollectionLink>
-          <CollectionLink to={`/xrays`}>
-            <Icon name="bolt" mr={1} />
-            {t`Quickstart x-rays`}
-          </CollectionLink>
+          {Variant1.shouldRender() && <Variant1 {...this.props} />}
+          {Variant2.shouldRender() && <Variant2 {...this.props} />}
         </Box>
         <CollectionLink
           to={Urls.collection("root")}
