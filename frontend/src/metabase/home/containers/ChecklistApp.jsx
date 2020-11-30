@@ -78,7 +78,7 @@ class ChecklistApp extends React.Component {
   render() {
     const { list } = this.props;
     return (
-      <Box w={"65%"} ml="auto" mr="auto">
+      <Box w={"80%"} ml="auto" mr="auto">
         <Flex py={2} align="center">
           <Heading>Setting up</Heading>
           <Icon name="ellipsis" ml="auto" />
