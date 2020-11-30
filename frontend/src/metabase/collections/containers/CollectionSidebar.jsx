@@ -82,6 +82,10 @@ class CollectionSidebar extends React.Component {
           <Subhead>{greeting}</Subhead>
         </Box>
         <Box my={2}>
+          <CollectionLink to={`/start`}>
+            <Icon name="star" mr={1} />
+            {t`Start here`}
+          </CollectionLink>
           <CollectionLink to={`/setup-checklist`}>
             <Icon name="check" mr={1} />
             {t`Setup checklist`}
@@ -89,10 +93,6 @@ class CollectionSidebar extends React.Component {
           <CollectionLink to={`/xrays`}>
             <Icon name="bolt" mr={1} />
             {t`Quickstart x-rays`}
-          </CollectionLink>
-          <CollectionLink to={`/start`}>
-            <Icon name="star" mr={1} />
-            {t`Start here`}
           </CollectionLink>
         </Box>
         <CollectionLink
