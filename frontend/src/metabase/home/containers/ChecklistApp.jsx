@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "grid-styled";
+import { Box, Flex } from "grid-styled";
 
 import { color } from "metabase/lib/colors";
 
@@ -8,6 +8,8 @@ import AdminChecklist from "metabase/entities/admin-checklist";
 import Icon from "metabase/components/Icon";
 import Link from "metabase/components/Link";
 import Subhead from "metabase/components/type/Subhead";
+import Heading from "metabase/components/type/Heading";
+import Text from "metabase/components/type/Text";
 
 const TaskList = ({ tasks }) => (
   <ol>
@@ -76,11 +78,16 @@ class ChecklistApp extends React.Component {
   render() {
     const { list } = this.props;
     return (
-      <Box w={"80%"} ml="auto" mr="auto">
-        <Subhead>Setting up</Subhead>
-        {list.map((section, index) => (
-          <TaskSection {...section} key={index} />
-        ))}
+      <Box w={"65%"} ml="auto" mr="auto">
+        <Flex py={2} align="center">
+          <Heading>Setting up</Heading>
+          <Icon name="ellipsis" ml="auto" />
+        </Flex>
+        <Box mt={2}>
+          {list.map((section, index) => (
+            <TaskSection {...section} key={index} />
+          ))}
+        </Box>
       </Box>
     );
   }

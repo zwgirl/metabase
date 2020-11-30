@@ -135,6 +135,7 @@ class CollectionSidebar extends React.Component {
 
         <Box className="mt-auto" pb={2} pl={SIDEBAR_SPACER * 2}>
           <Link
+            my={2}
             to={`/activity`}
             className="flex align-center text-bold text-light text-brand-hover"
           >
