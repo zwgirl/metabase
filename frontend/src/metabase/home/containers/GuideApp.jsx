@@ -18,7 +18,7 @@ const GuideApp = () => (
   <Box w={"80%"} ml="auto" mr="auto" pt={1}>
     <Flex py={2} align="center">
       <Heading>Getting started</Heading>
-      <Link ml="auto">Edit</Link>
+      <Icon name="ellipsis" ml="auto" />
     </Flex>
 
     <Box>

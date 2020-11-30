@@ -4,6 +4,7 @@ import { Box } from "grid-styled";
 import { t } from "ttag";
 import styled from "styled-components";
 import { createSelector } from "reselect";
+import { withRouter } from "react-router";
 
 import * as Urls from "metabase/lib/urls";
 import Greeting from "metabase/lib/greeting";
@@ -36,15 +37,14 @@ const mapStateToProps = state => ({
 
 const SIDEBAR_LOCAL_STORAGE_KEY = "MB_SIDEBAR_VARIANT";
 
-const Variant1 = () => (
+const Variant1 = props => (
   <span>
-    <CollectionLink to={`/start`}>
-      <Icon name="star" mr={1} />
-      {t`Start here`}
-    </CollectionLink>
-    <CollectionLink to={`/setup-checklist`}>
-      <Icon name="check" mr={1} />
-      {t`Setup checklist`}
+    <CollectionLink
+      to={`/start`}
+      selected={props.location.pathname === "/start"}
+    >
+      <Icon name="beaker" mr={1} />
+      {t`Setup`}
     </CollectionLink>
   </span>
 );
@@ -54,7 +54,7 @@ const getSidebarVariant = () =>
 
 const testVariant = variant => getSidebarVariant() === variant;
 
-Variant1.shouldRender = () => testVariant("1");
+Variant1.shouldRender = () => true;
 
 const Variant2 = () => (
   <span>
@@ -162,6 +162,13 @@ class CollectionSidebar extends React.Component {
 
         <Box className="mt-auto" pb={2} pl={SIDEBAR_SPACER * 2}>
           <Link
+            to={`/setup-checklist`}
+            className="flex align-center text-bold text-light text-brand-hover"
+          >
+            <Icon name="check" mr={1} />
+            {t`Setup checklist`}
+          </Link>
+          <Link
             my={2}
             to={`/activity`}
             className="flex align-center text-bold text-light text-brand-hover"
@@ -182,4 +189,4 @@ class CollectionSidebar extends React.Component {
   }
 }
 
-export default connect(mapStateToProps)(CollectionSidebar);
+export default withRouter(connect(mapStateToProps)(CollectionSidebar));
