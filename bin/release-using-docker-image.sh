@@ -10,11 +10,6 @@ docker build -t metabase/release --file bin/release/Dockerfile .
 
 docker run \
        -v /var/run/docker.sock:/var/run/docker.sock \
-       -v "$(pwd)"/:/metabase \
-       -v ~/.m2:/root/.m2 \
-       -v ~/.clojure:/root/.clojure \
-       -v ~/.yarn:/root/.yarn \
-       -v ~/.yarn-cache:/root/.yarn-cache \
        --mount type=bind,source="$(readlink -f ~/.aws)",target=/root/.aws,readonly \
        --mount type=bind,source="$(readlink -f ~/.ssh)",target=/root/.ssh,readonly \
        --env DOCKERHUB_EMAIL="$DOCKERHUB_EMAIL" \
