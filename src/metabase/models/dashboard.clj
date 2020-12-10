@@ -13,7 +13,7 @@
             [metabase.models
              [card :as card :refer [Card]]
              [collection :as collection]
-             [dashboard-card :as dashboard-card :refer [DashboardCard]]
+             [dashboard-card :as dashboard-card :refer [DashboardCard dashboard-pulses]]
              [field-values :as field-values]
              [interface :as i]
              [params :as params]
@@ -49,7 +49,6 @@
                             [:= :card.archived nil]]] ; e.g. DashCards with no corresponding Card, e.g. text Cards
                :order-by  [[:dashcard.created_at :asc]]})))
 
-
 ;;; ----------------------------------------------- Entity & Lifecycle -----------------------------------------------
 
 (models/defmodel Dashboard :report_dashboard)
@@ -76,14 +75,7 @@
 
 (defn- post-update [dashboard]
   ;; find any subscriptions for this dashboard and update the name to match
-  (let [affected (db/query
-                  {:select    [:p.id]
-                   :modifiers [:distinct]
-                   :from      [[Dashboard :d]]
-                   :join      [[DashboardCard :dc] [:= :dc.dashboard_id :d.id]
-                               [PulseCard :pc] [:= :pc.dashboard_card_id :dc.id]
-                               [Pulse :p] [:= :p.id :pc.pulse_id]]
-                   :where     [:= :d.id (:id dashboard)]})]
+  (let [affected (dashboard-pulses dashboard)]
     (when (seq affected)
       (db/update-where! Pulse {:id [:in (map :id affected)]}
                         :name (:name dashboard)))))

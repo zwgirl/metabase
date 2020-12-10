@@ -8,7 +8,8 @@
              [card :refer [Card]]
              [dashboard-card-series :refer [DashboardCardSeries]]
              [interface :as i]
-             [pulse-card :refer [PulseCard]]]
+             [pulse :as pulse :refer [Pulse]]
+             [pulse-card :as pulse-card :refer [PulseCard]]]
             [metabase.util.schema :as su]
             [schema.core :as s]
             [toucan
@@ -59,6 +60,17 @@
   [{:keys [dashboard_id]}]
   {:pre [(integer? dashboard_id)]}
   (db/select-one 'Dashboard, :id dashboard_id))
+
+(defn dashboard-pulses
+  "Return the Pulses associated with `dashboard`"
+  [dashboard-or-id]
+  (db/query {:select    [:p.id]
+             :modifiers [:distinct]
+             :from      [[Dashboard :d]]
+             :join      [[DashboardCard :dc] [:= :dc.dashboard_id :d.id]
+                         [PulseCard :pc] [:= :pc.dashboard_card_id :dc.id]
+                         [Pulse :p] [:= :p.id :pc.pulse_id]]
+             :where     [:= :d.id (u/get-id dashboard-or-id)]}))
 
 
 (defn ^:hydrate series
@@ -139,7 +151,8 @@
 
 (s/defn create-dashboard-card!
   "Create a new DashboardCard by inserting it into the database along with all associated pieces of data such as
-   DashboardCardSeries. Returns the newly created DashboardCard or throws an Exception."
+  DashboardCardSeries. Adds appropriate PulseCards as well. Returns the newly created DashboardCard or throws an
+  Exception."
   [dashboard-card :- NewDashboardCard]
   (let [{:keys [dashboard_id card_id creator_id parameter_mappings visualization_settings sizeX sizeY row col series]
          :or   {sizeX 2, sizeY 2, series []}} dashboard-card]
@@ -153,6 +166,10 @@
                                               :col                    (or col 0)
                                               :parameter_mappings     (or parameter_mappings [])
                                               :visualization_settings (or visualization_settings {}))]
+        (doseq [pulse-id (map :id (dashboard-pulses dashboard_id))]
+          (pulse-card/create! {:card_id           card_id
+                               :pulse_id          pulse-id
+                               :dashboard_card_id id}))
         ;; add series to the DashboardCard
         (update-dashboard-card-series! dashboard-card series)
         ;; return the full DashboardCard (and record our create event)
