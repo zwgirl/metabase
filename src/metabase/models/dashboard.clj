@@ -73,6 +73,17 @@
     (assert-valid-parameters dashboard)
     (collection/check-collection-namespace Dashboard (:collection_id dashboard))))
 
+(defn- dashboard-pulses
+  "Return the Pulses associated with `dashboard`"
+  [dashboard-or-id]
+  (db/query {:select    [:p.id]
+             :modifiers [:distinct]
+             :from      [[Dashboard :d]]
+             :join      [[DashboardCard :dc] [:= :dc.dashboard_id :d.id]
+                         [PulseCard :pc] [:= :pc.dashboard_card_id :dc.id]
+                         [Pulse :p] [:= :p.id :pc.pulse_id]]
+             :where     [:= :d.id (u/get-id dashboard-or-id)]}))
+
 (defn- post-update [dashboard]
   ;; find any subscriptions for this dashboard and update the name to match
   (let [affected (dashboard-pulses dashboard)]

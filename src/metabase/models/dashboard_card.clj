@@ -61,18 +61,6 @@
   {:pre [(integer? dashboard_id)]}
   (db/select-one 'Dashboard, :id dashboard_id))
 
-(defn dashboard-pulses
-  "Return the Pulses associated with `dashboard`"
-  [dashboard-or-id]
-  (db/query {:select    [:p.id]
-             :modifiers [:distinct]
-             :from      [[Dashboard :d]]
-             :join      [[DashboardCard :dc] [:= :dc.dashboard_id :d.id]
-                         [PulseCard :pc] [:= :pc.dashboard_card_id :dc.id]
-                         [Pulse :p] [:= :p.id :pc.pulse_id]]
-             :where     [:= :d.id (u/get-id dashboard-or-id)]}))
-
-
 (defn ^:hydrate series
   "Return the `Cards` associated as additional series on this DashboardCard."
   [{:keys [id]}]
