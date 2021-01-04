@@ -803,14 +803,6 @@ jobs:
           command: lint-prettier
           skip-key: prettier
 
-  fe-linter-flow:
-    executor: node
-    steps:
-      - run-yarn-command:
-          command-name: Run Flow type checker
-          command: lint-flow
-          skip-key: flow
-
   fe-linter-docs-links:
     executor: node
     steps:
@@ -1321,9 +1313,6 @@ workflows:
           requires:
             - fe-deps
       - fe-linter-prettier:
-          requires:
-            - fe-deps
-      - fe-linter-flow:
           requires:
             - fe-deps
       - fe-linter-docs-links:
