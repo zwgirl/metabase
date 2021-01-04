@@ -1,5 +1,3 @@
-/* @flow */
-
 import { isa, TYPE } from "metabase/lib/types";
 import {
   isLatitude,

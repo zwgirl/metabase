@@ -1,4 +1,3 @@
-/* eslint-disable flowtype/require-valid-file-annotation */
 import "metabase-lib/lib/Question";
 
 import React from "react";

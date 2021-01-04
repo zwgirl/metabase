@@ -1,5 +1,3 @@
-/* @flow */
-
 import ChartSettingInput from "metabase/visualizations/components/settings/ChartSettingInput";
 import ChartSettingInputGroup from "metabase/visualizations/components/settings/ChartSettingInputGroup";
 import ChartSettingInputNumeric from "metabase/visualizations/components/settings/ChartSettingInputNumeric";
