@@ -2,13 +2,10 @@
   - [Network Access log](#network-access-log)
   - [Application Logs](#application-logs)
   - [Using Papertrail for logging on AWS](#using-papertrail-for-logging-on-aws)
-- [Fault-tolerance/High-Availability in Metabase](#fault-tolerancehigh-availability-in-metabase)
-  - [Horizontal scaling with Elastic Beanstalk](#horizontal-scaling-with-elastic-beanstalk)
-  - [Upgrading Metabase with Rolling Update deployment](#upgrading-metabase-with-rolling-update-deployment)
 - [Running Metabase over HTTPS](#running-metabase-over-https)
-    - [Upload a Server Certificate](#upload-a-server-certificate)
-    - [Setup DNS CNAME (using AWS)](#setup-dns-cname-using-aws)
-    - [Modify Metabase to enforce HTTPS](#modify-metabase-to-enforce-https)
+  - [Upload a Server Certificate](#upload-a-server-certificate)
+  - [Setup DNS CNAME (using AWS)](#setup-dns-cname-using-aws)
+  - [Modify Metabase to enforce HTTPS](#modify-metabase-to-enforce-https)
 
 # Logging
 ## Network Access log
@@ -42,35 +39,11 @@ This provides a simple way to use the Papertrail logging service for collecting 
 
 _NOTE: Sometimes these settings will not apply until you restart your application server, which you can do by either choosing `Restart App Server(s)` from the Actions dropdown or by deploying the same version again._
 
-# Fault-tolerance/High-Availability in Metabase
-
-## Horizontal scaling with Elastic Beanstalk
-If you followed our guide for deploying Metabase with Elastic Beanstalk, you would have noticed that we used a Load Balancer for sending traffic to only one instance. This same load balancer can be used for sending traffic to multiple intances just by increasing the max instance number from 1 to the number you might need. so you can end up with more complex architecture like this one:
-![AWS Horizontal Scaling](images/Metabase-AWS-MI.png)
-
-Remember that horizontal scaling needs a single database to persist all the data, so please make sure to follow our guide for [creating an RDS database and connecting it to your instance first](creating-RDS-database-on-RDS.html)
-
-If you would like a reliable, scalable and fully managed Metabase, please consider our [Metabase Cloud](https://www.metabase.com/start/hosted/).
-
-## Upgrading Metabase with Rolling Update deployment
-
-Thanks to ElasticBeanstalk, when you have multiple instances you can update them one by one without downtime. This is useful if you have users in many timezones at once and you don't have a time period to upgrade the instances without leaving your users without Metabase.
-
-Rolling update deployment means that the Load Balancer will send traffic to a healthy instance while others are being upgraded, and when the first ones finish the update process, then the Load Balancer will switch the traffic to the upgraded instances while it upgrades the old ones.
-
-To enable this feature, you need to go to Rolling Updates and deployments section and click on the `Edit` button.
-
-![EB Edit button in Software Configuration](images/EBRollingUpdates.png)
-
-Once inside, you need to change the Deployment Policy to `Rolling` and the batch size to a fixed number (or percentage, depending on your needs). This number or percentage is the amount of instances that will be upgraded while leaving others receiving traffic. Click on `Save` at the end of the page once you are done with the configs.
-
-![EB Edit button in Software Configuration](images/EBRollingUpdatesConfig.png)
-
 # Running Metabase over HTTPS
 
-### Upload a Server Certificate
+This is only relevant if you plan to use HTTPS for your Metabase instance on AWS. There is no requirement to do this, but we are sticklers for security and believe you should always be careful with your data.
 
-This is only relevant if you plan to use HTTPS (recommended) for your Metabase instance on AWS. There is no requirement to do this, but we are sticklers for security and believe you should always be careful with your data.
+## Upload a Server Certificate
 
 First, you need to open a new tab in your browser and open AWS certificate manager. Once inside, you have the options for provisioning certificates or become a private certificate authority. We will choose `Provision certificates` and we will click on `Get Started`.
 
@@ -81,7 +54,7 @@ A blue button will appear on the top of the page with the feature to import cert
 
 On the following screens, you will have to input all the details and data about the certificate you want to import. After having followed the steps, you will now see the certificate in other tools of AWS (like HTTPS on your load balancer)
 
-### Setup DNS CNAME (using AWS)
+## Setup DNS CNAME (using AWS)
 
 - Open up AWS **Route 53** by navigating to **Services > Networking > Route 53** in the AWS Console header.
 - Click on **Hosted Zones** then click on the domain name you want to use for Metabase.
@@ -93,7 +66,7 @@ On the following screens, you will have to input all the details and data about 
   - Leave all other settings in their default values and click the **Create Record** button at the bottom of the page.
   - _NOTE: After the record is created you must wait for your change to propagate on the internet. This can take 5-10 minutes, sometimes longer._
 
-### Modify Metabase to enforce HTTPS
+## Modify Metabase to enforce HTTPS
 
 Before trying to enable HTTPS support you must upload a server certificate to your AWS account. Instructions above.
 
