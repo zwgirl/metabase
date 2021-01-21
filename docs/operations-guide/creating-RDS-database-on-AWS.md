@@ -10,8 +10,7 @@
 
 # Configuring RDS for Metabase (the recommended guide)
 
-If you want to move from using Metabase just for testing to something that is ready for the big time, you need to use a production-grade database like PostgreSQL or MySQL/MariaDB. This guide will provide you with all the steps for this venture so you end up with an architecture like the one below
-![AWS Postgres](images/Metabase-AWS-SI.png)
+If you want to move from using Metabase just for testing to something that is ready for the big time, you need to use a production-grade database like PostgreSQL or MySQL/MariaDB. This guide will provide you with all the steps for this venture. A high level architecture diagram of what you will achieve once you deploy Metabase with a dedicated application database can be [seen here](images/Metabase-AWS-SI.png)
 
 ## Step 1
 In AWS, enter RDS in the search box or select the service from the dropdown button on the top left of the page. Once inside RDS, click on the `Create database` button
@@ -50,7 +49,7 @@ On the page that appears after you click on the database identifer, you will see
 
 ![RDS Connection Data](images/RDSConnectionData.png)
 
-In the **Security group rules** section, you'll see the Security Group that was created, but the group will have a rule that allows only one IP address to access the database. You need to change this rule to allow access to the ElasticBeanstalk environment.
+In the **Security group rules** section, you'll see the Security Group that was created, but the group will have a rule that allows only one IP address to access the database. You need to change this rule to allow access to the Elastic Beanstalk environment.
 ![RDS Security Group Rules](images/RDSSecurityGroupRules.png)
 
 To configure the rule for the database, select the INBOUND rule, then click on the Inbound rules tab on the lower part of the page.
@@ -61,7 +60,7 @@ When you click on Inbound Rules, you need to click on `Edit Inbound Rules` butto
 
 ![RDS Edit Inbound Rule](images/RDSEditInboundRule.png)
 
-On the edit page, you need to delete the IP address that appears as default, then add the security group that the ElasticBeanstalk has (the Security group name will have the keyword AWSEBSecurityGroup  in its name). Once you add this security group, click the `Save rules button`.
+On the edit page, you need to delete the IP address that appears as default, then add the security group that the Elastic Beanstalk has (the Security group name will have the keyword AWSEBSecurityGroup  in its name). Once you add this security group, click the `Save rules button`.
 
 ![RDS Edit Inbound Rule](images/RDSEditInboundRuleSG.png)
 

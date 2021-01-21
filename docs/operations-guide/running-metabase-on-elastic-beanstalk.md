@@ -17,20 +17,26 @@
   - [Permissions](#permissions)
   - [Set or change environment variables](#set-or-change-environment-variables)
   - [Notifications](#notifications)
-- [Deploying New Versions of Metabase on ElasticBeanstalk](#deploying-new-versions-of-metabase-on-elasticbeanstalk)
+- [Deploying New Versions of Metabase on Elastic Beanstalk](#deploying-new-versions-of-metabase-on-elastic-beanstalk)
 
 # Running Metabase on AWS Elastic Beanstalk
 
 AWS Elastic Beanstalk has been a platform for easily deploying Metabase for a long time, however, we have changed this guide in order to provide better support and prevent users from using features from Elastic Beanstalk that will limit scaling Metabase easily in the future.
 
-The following steps will focus on preparing the deployment model you see in the picture below which follows AWS best practices:
-![Single instance, embedded database](images/Metabase-AWS-H2.png)
+The following guide will focus on deploying Metabase with a single instance and the embedded H2 database with the following components:
+- a region (where your Metabase application will exist)
+- a network (where your application will reside and interact with other applications or servers if needed)
+- a security group (a firewall, for keeping everything secure)
+- a load balancer (to make this deployment future proof and also provide features like HTTPS or Web Application Firewall security features)
+If you want to see a high-level architectural diagram of what you will achieve once you follow this guide, [click here](images/Metabase-AWS-H2.png)
 
-This architecture is the simplest one you can deploy but it is only prepared for testing the application. Don't worry, this guide gives you all the information to configure this same architecture into something prepared for production workloads if you want to.
+This architecture is the simplest one you can deploy but it is only prepared to test Metabase. Don't worry, this guide gives you all the information to configure this same architecture into something prepared for production workloads if you want to.
 
-If you would like a reliable, scalable and fully managed Metabase, please consider our [Metabase Cloud](https://www.metabase.com/start/hosted/).
+If you would like a reliable, scalable and fully managed Metabase, please consider [Metabase Cloud](https://www.metabase.com/start/hosted/).
 
 ## Quick Launch
+
+First of all you need to [download the file](https://downloads.metabase.com/{{ site.latest_version }}/launch-aws-eb.html) to upload to Elastic Beanstalk. This file contains the definition of Metabase docker image
 
 Metabase provides several pre-configured Elastic Beanstalk launch URL to help you get started with new installations. If you are starting fresh we recommend you follow this link in a new tab to begin creating the Elastic Beanstalk deployment with a few choices pre-filled. Then just follow the step-by-step instructions below to complete your installation. Choose your region based on the proximity of your users or if you have strict regulatory requirements that don't let you spin up servers in other countries:
 
@@ -51,9 +57,7 @@ Metabase provides several pre-configured Elastic Beanstalk launch URL to help yo
 - AP-Southeast-2 [Sydney](https://console.aws.amazon.com/elasticbeanstalk/home?region=ap-southeast-1#/newApplication?applicationName=Metabase&platform=Docker&environmentType=LoadBalancing&tierName=WebServer&instanceType=t3a.small&withVpc=true)
 - SA-east-1 [São Paulo](https://console.aws.amazon.com/elasticbeanstalk/home?region=sa-east-1#/newApplication?applicationName=Metabase&platform=Docker&environmentType=LoadBalancing&tierName=WebServer&instanceType=t3a.small&withVpc=true)
 
-[Launch Metabase on Elastic Beanstalk](https://downloads.metabase.com/{{ site.latest_version }}/launch-aws-eb.html)
-
-After clicking the launch URL, you should see a screen that looks like this:
+After clicking any launch URL, you should see a screen that looks like this:
 
 ![Elastic Beanstalk First Screen](images/EBFirstScreen.png)
 
@@ -82,7 +86,7 @@ While most of the fields here will be correctly pre-filled by following the laun
 
 ![Elastic Beanstalk Base Configuration](images/EBUploadYourCode.png)
 
-- On the Source Code Origin section click the `Choose file` button with the `Local File` radio button selected and upload the file you dowloaded previously (metabase-aws-eb.zip):
+- On the Source Code Origin section click the `Choose file` button with the `Local File` radio button selected and upload the file you dowloaded on the very beginning of this guide (metabase-aws-eb.zip):
 
 ![Elastic Beanstalk Base Configuration](images/EBUploadZipFile.png)
 
@@ -155,12 +159,12 @@ There are many ways to customize your Elastic Beanstalk deployment, but commonly
 
 ## Instance Details
 
-- `Instance type` (`Instances` block) is for picking the size of AWS instance you want to run. Any size is fine but we recommend `t3a.small` for most uses. You can always [scale](https://www.metabase.com/learn/data-diet/analytics/metabase-at-scale.html) vertically by changing this configuration.
+- `Instance type` (`Instances` block) is for picking the size of AWS instance you want to run. We recommend **at least** `t3a.small` for most uses. You can always [scale](https://www.metabase.com/learn/data-diet/analytics/metabase-at-scale.html) vertically by changing this configuration.
 - `EC2 key pair` (`Security` block) is only needed if you want to SSH into your instance directly which is __not recommended__
 
 ## PostgreSQL Metabase INSIDE Elastic Beanstalk configuration (not recommended)
 
-This was the recommended step in the previous versions of the configuration of Metabase in ElasticBeanstalk, however, as AWS ElasticBeanstalk creates a CloudFormation template when you hit the `Create App` button, this means that the database will be created with the ElasticBeanstalk stack and removed when you remove the application.
+This was the recommended step in the previous versions of the configuration of Metabase in Elastic Beanstalk, however, as AWS Elastic Beanstalk creates a CloudFormation template when you hit the `Create App` button, this means that the database will be created with the Elastic Beanstalk stack and removed when you remove the application.
 
 If you want to use a production-grade database based on best practices to persist all Metabase configurations you have to [create one in RDS separately](creating-RDS-database-on-AWS.html) or manage your own on a separate server and then connect the Elastic Beanstalk instance/s with the RDS database through [environment variables](#set-or-change-environment-variables).
 
@@ -171,7 +175,7 @@ If you want to continue on this path and you know what you are doing, then: look
 The database settings screen will give you a number of options for your application database. Regarding individual settings, we recommend:
 
 - `Snapshot` should be left as `None`.
-- `Engine` should be set to `postgres`. Metabase also supports MySQL/Maria DB as backing databases, but this guide currently only covers running Metabase on Postgres.
+- `Engine` should be set to `postgres`. Metabase also supports MySQL/Maria DB as backing databases but **only** on a separate running RDS connected via [environment variables](#set-or-change-environment-variables). Trying to follow these steps and selecting MySQL will result in an error.
 - `Engine version` can simply be left on the default, which should be the latest version.
 - For `Instance class` you can choose any size, but we recommend `db.t2.small` or larger for production installs. Metabase is pretty efficient so there is no need to make this a big instance.
 - You can safely leave `Storage` to the default size.
@@ -207,7 +211,7 @@ From here you will be able to set or change the variables for configuring many p
 Enter an `Email address` (`Notifications` block) to get notifications about your deployments and changes to your application. This is a very simple way to keep tabs on your Metabase environment, so we recommend putting a valid email in here.
 
 ---
-# Deploying New Versions of Metabase on ElasticBeanstalk
+# Deploying New Versions of Metabase on Elastic Beanstalk
 
 Upgrading to the next version of Metabase is a very simple process where you will grab the latest published Elastic Beanstalk deployment file from Metabase and upload it to your `Application Versions` listing. From there it's a couple clicks and you're upgraded.
 
@@ -231,5 +235,3 @@ Here's each step:
   - Wait until all deployment activities are completed, then verify the deployment by accessing the Metabase application URL.
 
 Once a new version is deployed you can safely delete the old Application Version if desired. We recommend keeping at least one previous version available for a while in case you desire to revert for any reason.
-
-If you want to upgrade Metabase without downtime, check our [advanced topics for running Metabase](advanced-topics-for-running-Metabase-in-AWS-ElasticBeanstalk.html)
