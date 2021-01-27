@@ -4,6 +4,7 @@ import { t } from "ttag";
 import { Flex } from "grid-styled";
 import { DragSource, DropTarget } from "react-dnd";
 import _ from "underscore";
+import styled from "styled-components";
 import colors, { lighten } from "metabase/lib/colors";
 
 import Icon from "metabase/components/Icon";
@@ -13,6 +14,15 @@ import Text from "metabase/components/type/Text";
 import Toggle from "metabase/components/Toggle";
 
 import { keyForColumn } from "metabase/lib/dataset";
+
+const DragWrapper = styled.div`
+  padding: 12px 14px;
+  box-shadow: 0 2px 3px ${lighten(colors["text-dark"], 1.5)};
+  &:hover {
+    box-shadow: 0 2px 5px ${lighten(colors["text-dark"], 1.3)};
+    transition: all 300ms linear;
+  }
+`;
 
 // eslint-disable-next-line no-unused-vars
 class ShowTotalsOption extends React.Component {
@@ -364,45 +374,42 @@ class Column extends React.Component {
     const showOptionsPanel = expanded && !isDragging;
     return connectDropTarget(
       connectDragSource(
-        <div
-          className="mb1 bordered rounded"
-          style={{
-            padding: "12px 14px",
-            "box-shadow": `0 2px 3px ${lighten(colors["text-dark"], 1.5)}`,
-            "&:hover": {
-              "box-shadow": `0 2px 5px ${lighten(colors["text-dark"], 1.3)}`,
-              transition: "all 300ms linear",
-            },
-          }}
-        >
-          <div
+        <div>
+          <DragWrapper
             className={cx(
-              "text-dark text-bold cursor-grab flex justify-between",
+              "text-dark mb1 bordered rounded cursor-grab text-bold flex justify-between",
               { disabled: isDragging },
             )}
           >
-            <span
-              onClick={this.toggleExpand}
-              className="cursor-pointer text-brand-hover hover-parent hover--inherit"
+            <div
+              className={cx(
+                "text-dark text-bold cursor-grab flex justify-between",
+                { disabled: isDragging },
+              )}
             >
-              {column.display_name}
-              <Icon
-                name={expanded ? "chevronup" : "chevrondown"}
-                size="10"
-                className="text-light hover-child hover--inherit ml1"
+              <span
+                onClick={this.toggleExpand}
+                className="cursor-pointer text-brand-hover hover-parent hover--inherit"
+              >
+                {column.display_name}
+                <Icon
+                  name={expanded ? "chevronup" : "chevrondown"}
+                  size="10"
+                  className="text-light hover-child hover--inherit ml1"
+                />
+              </span>
+              <Grabber style={{ width: 10 }} />
+            </div>
+            {showOptionsPanel && (
+              <ColumnOptionsPanel
+                className="text-medium"
+                partitionName={partitionName}
+                onChangeTotalsVisibility={this.handleChangeTotalsVisibility}
+                onChangeSortOrder={this.handleChangeSortOrder}
+                onEditFormatting={this.handleEditFormatting}
               />
-            </span>
-            <Grabber style={{ width: 10 }} />
-          </div>
-          {showOptionsPanel && (
-            <ColumnOptionsPanel
-              className="text-medium"
-              partitionName={partitionName}
-              onChangeTotalsVisibility={this.handleChangeTotalsVisibility}
-              onChangeSortOrder={this.handleChangeSortOrder}
-              onEditFormatting={this.handleEditFormatting}
-            />
-          )}
+            )}
+          </DragWrapper>
         </div>,
       ),
     );
